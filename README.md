@@ -3,123 +3,109 @@
   SPDX-License-Identifier: Apache-2.0
 -->
 
-# Agent Transaction Protocol (ATP)
+# Agent Transaction Protocol (ATP) 1.0
 
-The open protocol specification for autonomous agent action governance. Define, enforce, and verify what agents are permitted to do — and prove it.
+**The open protocol specification for autonomous agent action governance.**
 
-**Created by [Transient Intelligence Ltd](https://transientintelligence.com)**
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
+[![Spec](https://img.shields.io/badge/spec-ATP%201.0-green.svg)](./spec/ATP_1_0_SPEC.md)
+[![Conformance](https://img.shields.io/badge/conformance-machine--verified-brightgreen.svg)](./conformance-kit/)
 
-## What this repo contains
+*Created and maintained by [Transient Intelligence Ltd](https://transientintelligence.com)*
 
-- `spec/`: ATP 1.0 protocol specification (initial release baseline).
-- `conformance/`: ATP conformance checklist and claim boundaries.
-- `conformance-kit/`: reproducible conformance contract and artifacts.
-- `packages/spec`: `@atp/spec` protocol constants and schemas.
-- `packages/conformance-cli`: `@atp/conformance-cli` executable tooling.
+## The problem
 
-## Install
+Autonomous agents can now act without a human in the loop: browse, purchase, execute code, call APIs, move money. The missing piece is not capability. It is governance: a standardised way to record what an agent was authorised to do, what decision was made, and what happened — in a form that is tamper-evident and independently verifiable.
+
+Without that, you cannot audit an agent, hold a system accountable, or safely delegate anything that matters to an autonomous process.
+
+## What ATP defines
+
+Every governed agent action produces three canonical objects:
+
+| Object | What it represents |
+|--------|-------------------|
+| `Intent` | The declared action the agent wants to perform, and the identity making the request |
+| `Decision` | The governance outcome: `allow`, `approve`, or `deny` |
+| `Receipt` | The immutable, cryptographically signed record of the action and its outcome |
+
+Receipts are signed with Ed25519, tied to a public key published at `/.well-known/atp-keys`, and verifiable by any party with no dependency on the issuing system.
+
+## This repository
+
+| Path | Contents |
+|------|----------|
+| `spec/` | ATP 1.0 normative specification |
+| `conformance/` | Conformance checklist with stable requirement IDs (`ATP-L1-*`) |
+| `conformance-kit/` | Reproducible conformance contracts and verification artifacts |
+| `packages/spec` | `@atp/spec` — protocol constants, JSON schemas, Ed25519 signing, replay guard |
+| `packages/conformance-cli` | `@atp/conformance-cli` — conformance runner and validator CLI |
+
+## Getting started
 
 ```bash
 npm install
-```
-
-## Quick start
-
-```bash
 npm run conformance:kit
 ```
 
-## Stricter gate
+To run the full industry-grade gate:
 
 ```bash
 npm run conformance:industry
+npm run conformance:industry:strict   # higher-assurance profile
 ```
 
-This command runs the base conformance kit, negative invariant checks, interop matrix breadth checks, artifact digest generation, and an optional independent verifier hook.
-Industry gate strictness is contract-driven via `conformance-kit/expected/industry-gate.json`.
+## Using the packages
 
-Run strict posture profile:
-
-```bash
-npm run conformance:industry:strict
-```
-
-## Package usage
-
-Run the package CLI locally:
-
-```bash
-npm exec -- atp-conformance kit
-npm exec -- atp-conformance industry
-```
-
-### Cryptographic signing
+**Sign and verify a receipt:**
 
 ```js
 import { generateSigningKeyPair, signReceipt, verifyReceiptSignature, exportPublicKeyAsJwk, buildJwks } from '@atp/spec';
 
 const { privateKey, publicKey } = generateSigningKeyPair();
-const signed = signReceipt(receipt, privateKey, 'my-key-id');
+const signed = signReceipt(receipt, privateKey, 'key-2026-01');
 
-// Publish public key at /.well-known/atp-keys
-const jwks = buildJwks([ exportPublicKeyAsJwk(publicKey, 'my-key-id') ]);
+// Serve at /.well-known/atp-keys
+const jwks = buildJwks([ exportPublicKeyAsJwk(publicKey, 'key-2026-01') ]);
 
-// Verify on receipt
 const { ok } = verifyReceiptSignature(signed, publicKey);
 ```
 
-### Replay protection
+**Enforce replay protection:**
 
 ```js
 import { ReplayGuard } from '@atp/spec';
 
-const guard = new ReplayGuard(); // windowMs: 5 min, skewMs: 30 s
+const guard = new ReplayGuard(); // 5 minute window, 30 second clock skew tolerance
 const { ok, reason } = guard.check(receipt);
-// reason: 'receipt_replay_detected' | 'receipt_outside_window'
 ```
 
-Run explicit commands:
+**Run the conformance CLI:**
 
 ```bash
+npm exec -- atp-conformance kit
+npm exec -- atp-conformance industry
 npm exec -- atp-conformance run --openclaw-frames conformance-kit/fixtures/openclaw/gateway-frames-live.json
-npm exec -- atp-conformance validate --contract conformance-kit/expected/contract.json --report conformance-kit/artifacts/latest-report.json
 ```
-
-## What ATP is
-
-Agent Transaction Protocol (ATP) is a protocol specification for autonomous agent action governance, with a conformance framework to verify implementations against a shared standard.
-
-ATP matters because it provides the governance and auditability required for a credible, scalable agentic economy. Without a standardised way to authorise, constrain, and produce verifiable receipts for agent actions, autonomous systems cannot be trusted, audited, or held accountable at scale.
-
-ATP defines the lifecycle of an agent action — Intent → Decision → Receipt — with allow/approve/deny governance semantics and cryptographically signed, tamper-evident proof of what happened and who authorised it.
-
-## Cryptographic integrity (Gap closure summary)
-
-| Gap | What was closed |
-|-----|----------------|
-| **Key distribution** | `/.well-known/atp-keys` JWKS endpoint defined; `exportPublicKeyAsJwk` + `buildJwks` helpers ship in `@atp/spec` |
-| **Replay protection** | `ReplayGuard` reference implementation in `@atp/spec`; `receipt_replay_detected` / `receipt_outside_window` promoted to normative MUST |
-| **Legacy sha256 migration** | `validateReceiptATP` returns `{ ok, issues, warnings }`; legacy receipts pass with a deprecation warning — non-breaking migration path |
-
-## Professional qualifier for launch
-
-ATP 1.0 is available as an initial standards release with reproducible, machine-validated conformance artifacts. Verification evidence in this repository is generated by the published conformance kit and recorded in verifiable artifact outputs.
 
 ## Intended use
 
-- Protocol publishing
-- Conformance verification
-- Integrator evaluation and implementation testing
+ATP is designed for teams that need to govern and audit autonomous agent behaviour across systems:
 
-## Release and versioning policy
+- Implement ATP in an agent runtime and produce machine-verifiable conformance evidence
+- Require ATP conformance evidence in vendor or platform selection
+- Build auditing, accountability, and compliance tooling on a shared open standard
 
-- `docs/VERSIONING_POLICY.md`
-- `docs/RELEASE_POLICY.md`
+## Versioning and releases
+
+See [`docs/VERSIONING_POLICY.md`](./docs/VERSIONING_POLICY.md) and [`docs/RELEASE_POLICY.md`](./docs/RELEASE_POLICY.md).
 
 ## Acknowledgements
 
 See [`ACKNOWLEDGEMENTS.md`](./ACKNOWLEDGEMENTS.md) for standards and prior work that informed this specification.
 
----
+## Licence
 
-© 2026 Transient Intelligence Ltd. Agent Transaction Protocol (ATP) is a specification created and published by Transient Intelligence Ltd. Licensed under the Apache License, Version 2.0.
+Apache 2.0. See [`LICENSE`](./LICENSE) and [`NOTICE`](./NOTICE).
+
+© 2026 Transient Intelligence Ltd. Agent Transaction Protocol (ATP) is a specification created and published by Transient Intelligence Ltd.
