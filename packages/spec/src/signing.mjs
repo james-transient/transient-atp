@@ -1,0 +1,90 @@
+import { sign as cryptoSign, verify as cryptoVerify, generateKeyPairSync, createHash, createPublicKey } from "node:crypto";
+
+export const ATP_SIGNING_ALGORITHM = "Ed25519";
+export const ATP_SIGNING_VERSION = "ATP-ED25519-1";
+
+export function generateSigningKeyPair() {
+  return generateKeyPairSync("ed25519", {
+    publicKeyEncoding: { type: "spki", format: "pem" },
+    privateKeyEncoding: { type: "pkcs8", format: "pem" }
+  });
+}
+
+export function canonicalizeForSigning(receipt) {
+  const clone = structuredClone(receipt);
+  delete clone.signature;
+  return JSON.stringify(clone, Object.keys(clone).sort());
+}
+
+function sortedStringify(obj) {
+  if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
+    return JSON.stringify(obj);
+  }
+  const sorted = Object.fromEntries(Object.keys(obj).sort().map((key) => [key, obj[key]]));
+  return `{${Object.entries(sorted).map(([k, v]) => `${JSON.stringify(k)}:${sortedStringify(v)}`).join(",")}}`;
+}
+
+export function canonicalBytes(receipt) {
+  const clone = structuredClone(receipt);
+  delete clone.signature;
+  return Buffer.from(sortedStringify(clone), "utf8");
+}
+
+export function signReceipt(receipt, privateKeyPem, keyId) {
+  const payload = canonicalBytes(receipt);
+  const sigBuffer = cryptoSign(null, payload, privateKeyPem);
+  const sig = sigBuffer.toString("base64url");
+  return {
+    ...receipt,
+    signature: {
+      alg: ATP_SIGNING_ALGORITHM,
+      version: ATP_SIGNING_VERSION,
+      kid: keyId,
+      sig,
+      canonicalization: "ATP-JCS-SORTED-UTF8"
+    }
+  };
+}
+
+export function verifyReceiptSignature(receipt, publicKeyPem) {
+  const sig = receipt?.signature;
+  if (!sig || typeof sig !== "object") {
+    return { ok: false, reason: "receipt_invalid_signature", detail: "signature object missing" };
+  }
+  if (sig.alg !== ATP_SIGNING_ALGORITHM) {
+    return { ok: false, reason: "receipt_invalid_signature", detail: `unsupported algorithm '${sig.alg}'` };
+  }
+  if (typeof sig.sig !== "string" || !sig.sig.trim()) {
+    return { ok: false, reason: "receipt_invalid_signature", detail: "sig field missing or empty" };
+  }
+  try {
+    const payload = canonicalBytes(receipt);
+    const sigBuffer = Buffer.from(sig.sig, "base64url");
+    const valid = cryptoVerify(null, payload, publicKeyPem, sigBuffer);
+    if (!valid) return { ok: false, reason: "receipt_signature_verification_failed", detail: "signature mismatch" };
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, reason: "receipt_signature_verification_failed", detail: String(error?.message ?? error) };
+  }
+}
+
+export function exportPublicKeyAsJwk(publicKeyPem, kid) {
+  const keyObj = createPublicKey(publicKeyPem);
+  const raw = keyObj.export({ format: "jwk" });
+  return {
+    kty: "OKP",
+    crv: "Ed25519",
+    kid,
+    use: "sig",
+    x: raw.x
+  };
+}
+
+export function buildJwks(entries) {
+  return { keys: entries };
+}
+
+export function receiptFingerprint(receipt) {
+  const payload = canonicalBytes(receipt);
+  return createHash("sha256").update(payload).digest("hex");
+}

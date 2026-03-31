@@ -1,0 +1,7 @@
+{
+  "frames": [
+    { "type": "event", "payload": { "eventType": "tool_call_requested" } },
+    { "type": "event", "payload": { "eventType": "tool_call_executed" } },
+    { "type": "event", "payload": { "eventType": "run_end" } }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atp.dev/schemas/intent.schema.json",
+  "title": "ATP Intent",
+  "type": "object",
+  "required": [
+    "intent_id",
+    "actor_id",
+    "connector",
+    "action",
+    "action_class",
+    "target",
+    "context",
+    "governance_profile",
+    "requested_at"
+  ],
+  "properties": {
+    "intent_id": {
+      "type": "string",
+      "pattern": "^TI-\\d+$"
+    },
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "connector": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "action_class": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target": {
+      "type": "object"
+    },
+    "context": {
+      "type": "object"
+    },
+    "governance_profile": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@atp/conformance-cli",
+  "version": "1.0.0",
+  "description": "ATP conformance runner and validator CLI.",
+  "license": "Apache-2.0",
+  "author": "James Everest <james@transientintelligence.com> (https://transientintelligence.com)",
+  "type": "module",
+  "bin": {
+    "atp-conformance": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@atp/spec": "1.0.0"
+  },
+  "scripts": {
+    "test": "node --test ./test/smoke.test.mjs"
+  }
+}

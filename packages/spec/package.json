@@ -1,0 +1,21 @@
+{
+  "name": "@atp/spec",
+  "version": "1.0.0",
+  "description": "ATP protocol constants and JSON schemas.",
+  "license": "Apache-2.0",
+  "author": "James Everest <james@transientintelligence.com> (https://transientintelligence.com)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./schemas/intent": "./schemas/intent.schema.json",
+    "./schemas/decision": "./schemas/decision.schema.json",
+    "./schemas/receipt": "./schemas/receipt.schema.json"
+  },
+  "files": [
+    "src",
+    "schemas"
+  ],
+  "scripts": {
+    "test": "node --test ./test/smoke.test.mjs"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "requiredOverall": "PASS",
+  "requiredScenarioCoverage": {
+    "decisionOutcomes": ["allow", "approve", "deny"],
+    "executionStatuses": ["executed", "blocked", "expired", "error"],
+    "complete": true
+  },
+  "requiredRuntimes": [
+    {
+      "runtimeId": "financial-flowers-allow-under-budget",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "atpValid": true,
+      "passed": true
+    },
+    {
+      "runtimeId": "financial-flowers-approve-over-budget",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "atpValid": true,
+      "passed": true
+    },
+    {
+      "runtimeId": "financial-flowers-deny-blocked-merchant",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "atpValid": true,
+      "passed": true
+    },
+    {
+      "runtimeId": "scenario-expired-approval-window",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "atpValid": true,
+      "passed": true
+    },
+    {
+      "runtimeId": "scenario-error-runtime-failure",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "atpValid": true,
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+Agent Transaction Protocol (ATP)
+Copyright 2026 Transient Intelligence Ltd
+
+Created by James Everest.
+
+This product includes software developed by Transient Intelligence Ltd
+(https://transientintelligence.com).
+
+---
+
+ATP's signing model draws on patterns from W3C Verifiable Credentials,
+JSON Web Signatures (RFC 7515), JSON Web Key (RFC 7517), and JSON
+Canonicalization Scheme (RFC 8785). These are referenced for attribution
+only and are not distributed with this work.
+
+ATP's Policy Enforcement Point model draws on patterns demonstrated by
+NVIDIA NemoClaw (https://github.com/NVIDIA/NemoClaw), licensed Apache 2.0.

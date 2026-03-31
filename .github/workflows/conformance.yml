@@ -1,0 +1,26 @@
+name: ATP Conformance
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm install
+      - name: Run unit tests (spec)
+        run: npm run test:spec
+      - name: Run unit tests (conformance-cli)
+        run: npm run test:cli
+      - name: Run conformance kit
+        run: npm run conformance:kit
+      - name: Run industry gate
+        run: npm run conformance:industry

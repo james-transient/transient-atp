@@ -1,0 +1,6 @@
+{
+  "profile": "ATP_1_0_INDUSTRY_GATE",
+  "minimumDefinedTargets": 3,
+  "minimumImplementedTargets": 1,
+  "requireIndependentVerifier": false
+}

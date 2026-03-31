@@ -1,0 +1,419 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
+import { spawnSync } from "node:child_process";
+import { createSampleReceipt, validateReceiptATP } from "../src/lib/receipt.mjs";
+import { validateConformanceReport } from "../src/lib/contract-validate.mjs";
+import { generateSigningKeyPair, signReceipt, verifyReceiptSignature } from "@atp/spec";
+
+test("Ed25519 sign and verify round-trip on a valid receipt", () => {
+  const { privateKey, publicKey } = generateSigningKeyPair();
+  const base = createSampleReceipt({
+    runId: "ed25519-test",
+    sessionId: "ed25519-test",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(base, privateKey, "key-001");
+  assert.equal(typeof signed.signature, "object");
+  assert.equal(signed.signature.alg, "Ed25519");
+  assert.equal(signed.signature.kid, "key-001");
+  const result = verifyReceiptSignature(signed, publicKey);
+  assert.equal(result.ok, true);
+});
+
+test("Ed25519 signature fails verification with wrong key", () => {
+  const { privateKey } = generateSigningKeyPair();
+  const { publicKey: wrongKey } = generateSigningKeyPair();
+  const base = createSampleReceipt({
+    runId: "ed25519-wrong-key",
+    sessionId: "ed25519-wrong-key",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(base, privateKey, "key-001");
+  const result = verifyReceiptSignature(signed, wrongKey);
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "receipt_signature_verification_failed");
+});
+
+test("Ed25519 signed receipt passes validateReceiptATP", () => {
+  const { privateKey } = generateSigningKeyPair();
+  const base = createSampleReceipt({
+    runId: "ed25519-validate",
+    sessionId: "ed25519-validate",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(base, privateKey, "key-001");
+  const result = validateReceiptATP(signed);
+  assert.equal(result.ok, true);
+});
+
+test("legacy sha256 signature produces deprecation warning, not error", () => {
+  const receipt = createSampleReceipt({
+    runId: "legacy-sig-test",
+    sessionId: "legacy-sig-test",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  assert.match(receipt.signature, /^sha256:[a-f0-9]{64}$/);
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, true);
+  assert.equal(result.issues.length, 0);
+  assert.ok(result.warnings.length > 0);
+  assert.equal(result.warnings[0].code, "receipt_deprecated_legacy_signature");
+});
+
+test("cli run command returns ATP report", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const result = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "run", "--openclaw-frames", "conformance-kit/fixtures/openclaw/gateway-frames-live.json"],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(String(result.stdout ?? "{}"));
+  assert.equal(parsed.protocol, "ATP");
+  assert.equal(parsed.overall, "PASS");
+});
+
+test("cli validate command validates generated report", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const kit = spawnSync(process.execPath, ["packages/conformance-cli/src/cli.mjs", "kit"], {
+    cwd: repoRoot,
+    encoding: "utf8"
+  });
+  assert.equal(kit.status, 0);
+
+  const validate = spawnSync(
+    process.execPath,
+    [
+      "packages/conformance-cli/src/cli.mjs",
+      "validate",
+      "--contract",
+      "conformance-kit/expected/contract.json",
+      "--report",
+      "conformance-kit/artifacts/latest-report.json"
+    ],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.equal(validate.status, 0);
+  const parsed = JSON.parse(String(validate.stdout ?? "{}"));
+  assert.equal(parsed.ok, true);
+
+  const validationRaw = await readFile(resolve(repoRoot, "conformance-kit/artifacts/latest-validation.json"), "utf8");
+  const validation = JSON.parse(validationRaw);
+  assert.equal(validation.ok, true);
+});
+
+test("receipt validation rejects invalid execution_status and decision.outcome enums", () => {
+  const receipt = createSampleReceipt({
+    runId: "enum-test",
+    sessionId: "enum-test",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "run_start", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:01.000Z" }
+    ]
+  });
+  receipt.execution_status = "totally_invalid";
+  receipt.decision.outcome = "not_a_real_outcome";
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_invalid_execution_status"), true);
+  assert.equal(codes.has("decision_invalid_outcome"), true);
+});
+
+test("receipt validation rejects invalid captured_at datetime", () => {
+  const receipt = createSampleReceipt({
+    runId: "captured-at-test",
+    sessionId: "captured-at-test",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "run_start", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:01.000Z" }
+    ]
+  });
+  receipt.captured_at = "not-a-date";
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_invalid_captured_at"), true);
+});
+
+test("receipt validation rejects schema-incompatible receipt fields", () => {
+  const receipt = createSampleReceipt({
+    runId: "schema-invalid",
+    sessionId: "schema-invalid",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "run_start", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:01.000Z" }
+    ]
+  });
+  delete receipt.schemaVersion;
+  receipt.signature = "garbage";
+  receipt.occurred_at = "2026-03-31";
+  receipt.received_at = "2026-03-31";
+  receipt.sealed_at = "2026-03-31";
+  delete receipt.decision.reason_code;
+  delete receipt.intent.actor_id;
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_missing_required_field"), true);
+  assert.equal(codes.has("receipt_invalid_schema_version"), true);
+  assert.equal(codes.has("receipt_invalid_signature_format"), true);
+  assert.equal(codes.has("receipt_invalid_datetime_format"), true);
+});
+
+test("proof harness rejects non-frame JSON input", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const tempFile = resolve(await mkdtemp(resolve(tmpdir(), "atp-nonframe-")), "not-frames.json");
+  await writeFile(tempFile, JSON.stringify({ hello: "world" }, null, 2));
+  const run = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "run", "--openclaw-frames", tempFile, "--allow-local-artifacts"],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.notEqual(run.status, 0);
+  assert.match(String(run.stderr ?? ""), /'frames' array/i);
+});
+
+test("receipt validation rejects missing intent and event_snapshot object bypass", () => {
+  const receipt = createSampleReceipt({
+    runId: "obj-test",
+    sessionId: "obj-test",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "run_start", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:01.000Z" }
+    ]
+  });
+  delete receipt.intent;
+  delete receipt.event_snapshot;
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_missing_required_object"), true);
+});
+
+test("receipt validation rejects cross-object id mismatch", () => {
+  const receipt = createSampleReceipt({
+    runId: "id-mismatch",
+    sessionId: "id-mismatch",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "run_start", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:01.000Z" }
+    ]
+  });
+  receipt.intent.intent_id = "TI-999999999";
+  receipt.decision.intent_id = "TI-111111111";
+  receipt.decision.decision_id = "TD-222222222";
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_intent_id_mismatch"), true);
+  assert.equal(codes.has("receipt_decision_id_mismatch"), true);
+});
+
+test("contract validator rejects weak empty contract", () => {
+  const result = validateConformanceReport({}, {});
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /requiredScenarioCoverage/);
+});
+
+test("contract validator rejects malformed requiredRuntimes typing", () => {
+  const report = {
+    overall: "PASS",
+    scenarioCoverage: {
+      complete: true,
+      decisionOutcomes: { covered: ["allow", "approve", "deny"] },
+      executionStatuses: { covered: ["executed", "blocked", "expired", "error"] }
+    },
+    results: [
+      {
+        runtimeId: "r1",
+        requiredLevel: "CLASSIFY_ONLY",
+        requiredAtpL1: true,
+        passed: false,
+        atpL1: { valid: true }
+      }
+    ]
+  };
+  const contract = {
+    requiredOverall: "PASS",
+    requiredScenarioCoverage: {
+      decisionOutcomes: ["allow", "approve", "deny"],
+      executionStatuses: ["executed", "blocked", "expired", "error"],
+      complete: true
+    },
+    requiredRuntimes: [
+      {
+        runtimeId: "r1",
+        passed: "true",
+        requiredLevel: 1,
+        requiredAtpL1: "yes",
+        atpValid: "true"
+      }
+    ]
+  };
+  const result = validateConformanceReport(report, contract);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /requiredRuntimes\[0\]\.passed must be boolean/);
+});
+
+test("proof harness rejects frame payloads missing required semantic event types", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const tempFile = resolve(await mkdtemp(resolve(tmpdir(), "atp-minimal-frame-")), "frames.json");
+  await writeFile(
+    tempFile,
+    JSON.stringify({ frames: [{ type: "event", payload: { eventType: "run_end" } }] }, null, 2)
+  );
+  const run = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "run", "--openclaw-frames", tempFile, "--allow-local-artifacts"],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.notEqual(run.status, 0);
+  assert.match(String(run.stderr ?? ""), /missing required event types/i);
+});
+
+test("proof harness rejects local-artifact-like paths without allow flag", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const tempDir = await mkdtemp(resolve(tmpdir(), "tt-local-like-"));
+  const tempFile = resolve(tempDir, "TT-LOCAL");
+  await writeFile(
+    tempFile,
+    JSON.stringify(
+      {
+        frames: [
+          { type: "event", payload: { eventType: "tool_call_requested" } },
+          { type: "event", payload: { eventType: "tool_call_executed" } },
+          { type: "event", payload: { eventType: "run_end" } }
+        ]
+      },
+      null,
+      2
+    )
+  );
+  const run = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "run", "--openclaw-frames", tempFile],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.notEqual(run.status, 0);
+  assert.match(String(run.stderr ?? ""), /rejects local runtime artifact inputs/i);
+});
+
+test("industry gate rejects negative threshold values", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const tempFile = resolve(await mkdtemp(resolve(tmpdir(), "atp-negative-thresholds-")), "industry.json");
+  await writeFile(
+    tempFile,
+    JSON.stringify(
+      {
+        profile: "ATP_1_0_INDUSTRY_GATE",
+        minimumDefinedTargets: -100,
+        minimumImplementedTargets: -100,
+        requireIndependentVerifier: false
+      },
+      null,
+      2
+    )
+  );
+  const run = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "industry", "--industry-contract", tempFile],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.notEqual(run.status, 0);
+  assert.match(String(run.stdout ?? ""), /INTEROP-MATRIX/);
+});
+
+test("industry gate rejects zero thresholds", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const tempFile = resolve(await mkdtemp(resolve(tmpdir(), "atp-zero-thresholds-")), "industry.json");
+  await writeFile(
+    tempFile,
+    JSON.stringify(
+      {
+        profile: "ATP_1_0_INDUSTRY_GATE",
+        minimumDefinedTargets: 0,
+        minimumImplementedTargets: 0,
+        requireIndependentVerifier: false
+      },
+      null,
+      2
+    )
+  );
+  const run = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "industry", "--industry-contract", tempFile],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.notEqual(run.status, 0);
+  assert.match(String(run.stdout ?? ""), /INTEROP-MATRIX/);
+});
+
+test("industry gate rejects malformed requireIndependentVerifier contract typing", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const tempFile = resolve(await mkdtemp(resolve(tmpdir(), "atp-verifier-type-")), "industry.json");
+  await writeFile(
+    tempFile,
+    JSON.stringify(
+      {
+        profile: "ATP_1_0_INDUSTRY_GATE",
+        minimumDefinedTargets: 3,
+        minimumImplementedTargets: 1,
+        requireIndependentVerifier: "yes"
+      },
+      null,
+      2
+    )
+  );
+  const run = spawnSync(
+    process.execPath,
+    ["packages/conformance-cli/src/cli.mjs", "industry", "--industry-contract", tempFile],
+    {
+      cwd: repoRoot,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        ATP_INDEPENDENT_VERIFIER_CMD: "true"
+      }
+    }
+  );
+  assert.notEqual(run.status, 0);
+  assert.match(String(run.stdout ?? ""), /INDEPENDENT-VERIFIER-HOOK/);
+});

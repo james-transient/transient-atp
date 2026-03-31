@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atp.dev/schemas/receipt.schema.json",
+  "title": "ATP Receipt",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "receipt_id",
+    "intent_id",
+    "decision_id",
+    "execution_status",
+    "captured_at",
+    "signature",
+    "occurred_at",
+    "received_at",
+    "sealed_at",
+    "event_snapshot",
+    "event_snapshot_hash",
+    "correlation_id",
+    "intent",
+    "decision"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "minLength": 1
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^TR-\\d+$"
+    },
+    "intent_id": {
+      "type": "string",
+      "pattern": "^TI-\\d+$"
+    },
+    "decision_id": {
+      "type": "string",
+      "pattern": "^TD-\\d+$"
+    },
+    "execution_status": {
+      "type": "string",
+      "enum": ["executed", "blocked", "expired", "error"]
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["alg", "kid", "sig", "canonicalization"],
+          "properties": {
+            "alg": { "type": "string", "enum": ["Ed25519"] },
+            "version": { "type": "string" },
+            "kid": { "type": "string", "minLength": 1 },
+            "sig": { "type": "string", "minLength": 1 },
+            "canonicalization": { "type": "string" }
+          }
+        },
+        {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Legacy hash-only signature. Implementations SHOULD migrate to Ed25519 object form."
+        }
+      ]
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sealed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event_snapshot": {
+      "type": "object"
+    },
+    "event_snapshot_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_hash": {
+      "type": "object",
+      "description": "RECOMMENDED. Hash of canonicalized input payload. Implementations SHOULD use this instead of embedding raw input.",
+      "required": ["alg", "digest"],
+      "properties": {
+        "alg": { "type": "string", "enum": ["sha256"] },
+        "digest": { "type": "string", "minLength": 1 }
+      }
+    },
+    "output_hash": {
+      "type": "object",
+      "description": "RECOMMENDED. Hash of canonicalized output payload. Implementations SHOULD use this instead of embedding raw output.",
+      "required": ["alg", "digest"],
+      "properties": {
+        "alg": { "type": "string", "enum": ["sha256"] },
+        "digest": { "type": "string", "minLength": 1 }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "description": "OPTIONAL. Financial or resource cost attributed to this action.",
+      "required": ["amount", "currency"],
+      "properties": {
+        "amount": { "type": "string", "description": "Decimal string to avoid floating-point ambiguity." },
+        "currency": { "type": "string", "description": "ISO 4217 code or protocol-specific token symbol." },
+        "unit": { "type": "string" },
+        "payer": { "type": "string", "description": "Actor funding the action." }
+      }
+    },
+    "intent": {
+      "$ref": "https://atp.dev/schemas/intent.schema.json"
+    },
+    "decision": {
+      "$ref": "https://atp.dev/schemas/decision.schema.json"
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,22 @@
+{
+  "name": "transient-atp",
+  "version": "0.1.0",
+  "description": "The open protocol specification for autonomous agent action governance — Agent Transaction Protocol (ATP) 1.0.",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "James Everest <james@transientintelligence.com> (https://transientintelligence.com)",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "conformance:proof": "node scripts/conformance-proof-harness.mjs",
+    "conformance:proof:fresh": "node scripts/conformance-proof-harness.mjs --openclaw-frames conformance-kit/fixtures/openclaw/gateway-frames-live.json",
+    "conformance:kit": "node scripts/conformance-kit-validate.mjs",
+    "conformance:industry": "node scripts/conformance-industry-gate.mjs",
+    "conformance:industry:strict": "node scripts/conformance-industry-gate.mjs --industry-contract conformance-kit/expected/industry-gate.strict.json",
+    "conformance:soak": "node scripts/conformance-soak-fuzz.mjs",
+    "test:spec": "npm run -w @atp/spec test",
+    "test:cli": "npm run -w @atp/conformance-cli test"
+  }
+}

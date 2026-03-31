@@ -1,0 +1,19 @@
+{
+  "targets": [
+    {
+      "targetId": "openclaw-adapter",
+      "transport": "streamable-http",
+      "status": "implemented"
+    },
+    {
+      "targetId": "generic-http-agent-runtime",
+      "transport": "http-json",
+      "status": "planned"
+    },
+    {
+      "targetId": "mcp-session-runtime",
+      "transport": "mcp",
+      "status": "planned"
+    }
+  ]
+}
