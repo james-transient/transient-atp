@@ -1,7 +1,14 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { hashEventSnapshot, createSampleReceipt, validateReceiptATP } from "./receipt.mjs";
-import { generateSigningKeyPair, signReceipt } from "@atp/spec";
+import { createHash, createPublicKey } from "node:crypto";
+import {
+  generateSigningKeyPair,
+  signReceipt,
+  exportPublicKeyAsJwk,
+  buildJwks,
+  verifyReceiptSignature
+} from "@atp/spec";
 
 const REQUIRED_LIFECYCLE_STAGES = Object.freeze([
   "preflight_declaration",
@@ -18,6 +25,10 @@ function hasBlockedPath(manifestPaths, blockedPrefixes) {
   const paths = Array.isArray(manifestPaths) ? manifestPaths : [];
   const blocked = Array.isArray(blockedPrefixes) ? blockedPrefixes : [];
   return paths.some((item) => blocked.some((prefix) => pathMatchesPolicy(String(item), String(prefix))));
+}
+
+function sha256Hex(value) {
+  return createHash("sha256").update(String(value)).digest("hex");
 }
 
 function escapeRegex(value) {
@@ -70,17 +81,60 @@ function buildReleaseReceipt(evidence) {
 
   baseReceipt.event_snapshot_hash = hashEventSnapshot(baseReceipt.event_snapshot);
   const keyPair = generateSigningKeyPair();
-  return signReceipt(baseReceipt, keyPair.privateKey, "release-governance-profile-key");
+  const kid = `rgp-${sha256Hex(keyPair.publicKey).slice(0, 16)}`;
+  const receipt = signReceipt(baseReceipt, keyPair.privateKey, kid);
+  const jwk = exportPublicKeyAsJwk(keyPair.publicKey, kid);
+  return {
+    receipt,
+    signing: {
+      jwks: buildJwks([jwk])
+    }
+  };
 }
 
 function evaluateCheck(id, ok, message) {
   return { id, ok: Boolean(ok), message };
 }
 
-export function evaluateReleaseGovernanceEvidence(evidence) {
+function buildLifecycleStageNames(lifecycleEntries) {
+  return (Array.isArray(lifecycleEntries) ? lifecycleEntries : []).map((item) => String(item?.stage ?? ""));
+}
+
+function stageIndex(stageNames, stage) {
+  return stageNames.indexOf(stage);
+}
+
+function verifyReceiptWithJwks(receipt, jwks) {
+  const kid = String(receipt?.signature?.kid ?? "");
+  const keys = Array.isArray(jwks?.keys) ? jwks.keys : [];
+  const keyEntry = keys.find((entry) => String(entry?.kid ?? "") === kid);
+  if (!keyEntry) {
+    return {
+      keyResolved: false,
+      signatureOk: false,
+      detail: "kid not found in jwks"
+    };
+  }
+  try {
+    const publicKeyPem = createPublicKey({ key: keyEntry, format: "jwk" }).export({ type: "spki", format: "pem" });
+    const verify = verifyReceiptSignature(receipt, publicKeyPem);
+    return {
+      keyResolved: true,
+      signatureOk: verify.ok === true,
+      detail: verify.ok ? "signature verified" : String(verify?.detail ?? verify?.reason ?? "signature verification failed")
+    };
+  } catch (error) {
+    return {
+      keyResolved: true,
+      signatureOk: false,
+      detail: String(error?.message ?? error)
+    };
+  }
+}
+
+function evaluateReleaseGovernanceData({ receipt, lifecycleEntries, policy, signing }) {
   const checks = [];
-  const receipt = buildReleaseReceipt(evidence);
-  const lifecycle = Array.isArray(evidence?.lifecycle) ? evidence.lifecycle.map((item) => String(item?.stage ?? "")) : [];
+  const lifecycle = buildLifecycleStageNames(lifecycleEntries);
   const outcome = String(receipt?.decision?.outcome ?? "");
   const executionStatus = String(receipt?.execution_status ?? "");
 
@@ -100,12 +154,34 @@ export function evaluateReleaseGovernanceEvidence(evidence) {
     )
   );
 
-  const requiresApproval = Boolean(evidence?.policy?.require_approval === true);
+  const preflightIdx = stageIndex(lifecycle, "preflight_declaration");
+  const policyIdx = stageIndex(lifecycle, "policy_evaluation");
+  const execIdx = stageIndex(lifecycle, "execution_authorization");
+  const postIdx = stageIndex(lifecycle, "post_execution_attestation");
+  const ordered = preflightIdx !== -1 && policyIdx !== -1 && execIdx !== -1 && postIdx !== -1 &&
+    preflightIdx < policyIdx && policyIdx < execIdx && execIdx < postIdx;
+  checks.push(
+    evaluateCheck(
+      "RGP-LIFECYCLE-ORDER",
+      ordered,
+      "lifecycle stages must be ordered: preflight -> policy -> execution -> post-attestation"
+    )
+  );
+
+  const requiresApproval = Boolean(policy?.require_approval === true);
+  const approvalGateIdx = stageIndex(lifecycle, "approval_gate");
   checks.push(
     evaluateCheck(
       "RGP-LIFECYCLE-APPROVAL-GATE",
-      !requiresApproval || lifecycle.includes("approval_gate"),
-      "approval_gate lifecycle stage is required when policy requires approval"
+      !requiresApproval || (approvalGateIdx !== -1 && approvalGateIdx > policyIdx && approvalGateIdx < execIdx),
+      "approval_gate lifecycle stage is required between policy evaluation and execution authorization when policy requires approval"
+    )
+  );
+  checks.push(
+    evaluateCheck(
+      "RGP-APPROVAL-OUTCOME",
+      !requiresApproval || outcome === "approve",
+      "decision.outcome must be approve when policy.require_approval is true"
     )
   );
 
@@ -133,7 +209,7 @@ export function evaluateReleaseGovernanceEvidence(evidence) {
   checks.push(
     evaluateCheck(
       "RGP-BLOCKED-PATHS",
-      !hasBlockedPath(receipt?.event_snapshot?.release?.manifest_paths, evidence?.policy?.blocked_paths),
+      !hasBlockedPath(receipt?.event_snapshot?.release?.manifest_paths, policy?.blocked_paths),
       "manifest paths must not include blocked path policy matches"
     )
   );
@@ -170,12 +246,52 @@ export function evaluateReleaseGovernanceEvidence(evidence) {
     )
   );
 
+  const signatureCheck = verifyReceiptWithJwks(receipt, signing?.jwks);
+  checks.push(
+    evaluateCheck(
+      "RGP-SIGNATURE-KEY-RESOLUTION",
+      signatureCheck.keyResolved,
+      `signature kid must resolve in jwks (${signatureCheck.detail})`
+    )
+  );
+  checks.push(
+    evaluateCheck(
+      "RGP-SIGNATURE-VERIFIED",
+      signatureCheck.signatureOk,
+      `receipt signature must verify against jwks key (${signatureCheck.detail})`
+    )
+  );
+
+  return {
+    checks,
+    lifecycle
+  };
+}
+
+export function evaluateReleaseGovernanceEvidence(evidence) {
+  const built = buildReleaseReceipt(evidence);
+  const receipt = built.receipt;
+  const evaluated = evaluateReleaseGovernanceData({
+    receipt,
+    lifecycleEntries: evidence?.lifecycle,
+    policy: evidence?.policy,
+    signing: built.signing
+  });
+  const checks = evaluated.checks;
+  const lifecycle = evaluated.lifecycle;
+
   const failures = checks.filter((entry) => !entry.ok).map((entry) => `${entry.id}: ${entry.message}`);
 
   return {
     profile: "ATP_1_0_RELEASE_GOVERNANCE",
     generatedAt: new Date().toISOString(),
+    lifecycle: Array.isArray(evidence?.lifecycle) ? evidence.lifecycle : [],
     lifecycleStages: lifecycle,
+    policy: {
+      require_approval: Boolean(evidence?.policy?.require_approval === true),
+      blocked_paths: Array.isArray(evidence?.policy?.blocked_paths) ? evidence.policy.blocked_paths : []
+    },
+    signing: built.signing,
     receipt,
     checks,
     failures,
@@ -201,12 +317,24 @@ export function validateReleaseGovernanceReport(report, contract) {
     failures.push(`overall expected '${contract.requiredOverall}' but got '${report?.overall}'`);
   }
 
-  const reportStages = new Set(Array.isArray(report?.lifecycleStages) ? report.lifecycleStages : []);
+  const reportStages = new Set(
+    Array.isArray(report?.lifecycleStages)
+      ? report.lifecycleStages
+      : buildLifecycleStageNames(report?.lifecycle)
+  );
   for (const stage of contract.requiredLifecycleStages) {
     if (!reportStages.has(stage)) failures.push(`missing lifecycle stage '${stage}'`);
   }
 
-  const checkById = new Map((Array.isArray(report?.checks) ? report.checks : []).map((item) => [String(item?.id ?? ""), item]));
+  const recomputed = evaluateReleaseGovernanceData({
+    receipt: report?.receipt,
+    lifecycleEntries: Array.isArray(report?.lifecycle)
+      ? report.lifecycle
+      : (Array.isArray(report?.lifecycleStages) ? report.lifecycleStages.map((stage) => ({ stage })) : []),
+    policy: report?.policy ?? {},
+    signing: report?.signing ?? {}
+  });
+  const checkById = new Map(recomputed.checks.map((item) => [String(item?.id ?? ""), item]));
   for (const checkId of requiredChecks) {
     const check = checkById.get(String(checkId));
     if (!check) {
@@ -214,6 +342,14 @@ export function validateReleaseGovernanceReport(report, contract) {
       continue;
     }
     if (check.ok !== true) failures.push(`required check '${checkId}' failed`);
+  }
+
+  const reportedCheckById = new Map((Array.isArray(report?.checks) ? report.checks : []).map((item) => [String(item?.id ?? ""), item]));
+  for (const [checkId, recomputedCheck] of checkById.entries()) {
+    const reported = reportedCheckById.get(checkId);
+    if (reported && Boolean(reported?.ok) !== Boolean(recomputedCheck?.ok)) {
+      failures.push(`reported check '${checkId}' does not match recomputed result`);
+    }
   }
 
   return { ok: failures.length === 0, failures };

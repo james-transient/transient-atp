@@ -35,9 +35,15 @@ For each governed publish transaction, implementations MUST represent the follow
 
 The `Intent` object MUST be declared before policy evaluation.
 
+Lifecycle order MUST be:
+
+- `preflight declaration` -> `policy evaluation` -> `execution authorization` -> `post-execution attestation`
+
 Execution MUST NOT proceed if policy evaluation returns a deny decision.
 
 Where policy requires approval, execution MUST NOT proceed until approval is resolved with an `approve` outcome.
+
+Where policy requires approval, an `approval gate` stage MUST be present between policy evaluation and execution authorization.
 
 ## Intent Requirements (Release Profile)
 
@@ -83,6 +89,8 @@ Digest binding MUST hold:
 If a blocked path policy is configured, `event_snapshot.release.manifest_paths` MUST NOT contain blocked paths.
 
 Release profile receipts MUST use Ed25519 object signatures (`signature.alg == "Ed25519"`). Deprecated legacy `sha256:` string signatures MUST NOT be used for this profile.
+
+Release profile signatures MUST be verifiable using key material that resolves `signature.kid` (for example, profile-scoped JWKS or equivalent key distribution mechanism).
 
 ## Conformance Notes
 

@@ -90,13 +90,17 @@ The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, RECOMMENDED, 
 
 - `ATP-L1-RGP-001`: For governed `registry.publish` actions, implementations MUST emit ATP `Intent`, `Decision`, and `Receipt` objects.
 - `ATP-L1-RGP-002`: The lifecycle stages `preflight declaration`, `policy evaluation`, `execution authorization`, and `post-execution attestation` MUST be represented in evidence.
-- `ATP-L1-RGP-003`: Where policy requires explicit approval, an `approval gate` stage MUST be represented and execution MUST NOT proceed before approval resolution.
+- `ATP-L1-RGP-003`: Lifecycle stage order MUST be `preflight declaration` -> `policy evaluation` -> `execution authorization` -> `post-execution attestation`.
+- `ATP-L1-RGP-004`: Where policy requires explicit approval, an `approval gate` stage MUST be represented between policy evaluation and execution authorization.
+- `ATP-L1-RGP-005`: Where policy requires explicit approval, `decision.outcome` MUST be `approve` before execution is authorized.
 - `ATP-L1-RGP-004`: `intent.context` MUST include `package_name`, `package_version`, `expected_tarball_sha256`, and `expected_manifest_sha256` for `registry.publish`.
-- `ATP-L1-RGP-005`: Release profile receipts MUST satisfy ATP-L1 receipt invariants.
-- `ATP-L1-RGP-006`: Digest binding MUST hold between intent and receipt evidence (`expected_tarball_sha256 == release.tarball_sha256` and `expected_manifest_sha256 == release.manifest_sha256`).
-- `ATP-L1-RGP-007`: If blocked path policy is configured, published manifest paths MUST NOT include blocked paths.
-- `ATP-L1-RGP-008`: Implementations MUST fail closed on deny decisions for publish actions.
-- `ATP-L1-RGP-009`: Release profile receipts MUST use Ed25519 object signatures and MUST NOT use deprecated legacy `sha256:` signature strings.
+- `ATP-L1-RGP-006`: `intent.context` MUST include `package_name`, `package_version`, `expected_tarball_sha256`, and `expected_manifest_sha256` for `registry.publish`.
+- `ATP-L1-RGP-007`: Release profile receipts MUST satisfy ATP-L1 receipt invariants.
+- `ATP-L1-RGP-008`: Digest binding MUST hold between intent and receipt evidence (`expected_tarball_sha256 == release.tarball_sha256` and `expected_manifest_sha256 == release.manifest_sha256`).
+- `ATP-L1-RGP-009`: If blocked path policy is configured, published manifest paths MUST NOT include blocked paths.
+- `ATP-L1-RGP-010`: Implementations MUST fail closed on deny decisions for publish actions.
+- `ATP-L1-RGP-011`: Release profile receipts MUST use Ed25519 object signatures and MUST NOT use deprecated legacy `sha256:` signature strings.
+- `ATP-L1-RGP-012`: Release profile signatures MUST be verifiable using a key resolved by `signature.kid` in provided key material.
 
 ## Verification Artifacts
 

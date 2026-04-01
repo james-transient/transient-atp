@@ -493,6 +493,116 @@ test("release governance rejects blocked path exposure using glob pattern", asyn
   assert.equal(failedChecks.has("RGP-BLOCKED-PATHS"), true);
 });
 
+test("release governance rejects allow outcome when policy requires approval", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const fixtureRaw = await readFile(
+    resolve(repoRoot, "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+    "utf8"
+  );
+  const fixture = JSON.parse(fixtureRaw);
+  fixture.policy.require_approval = true;
+  fixture.haltReason = "none";
+  fixture.runStatus = "success";
+  const report = evaluateReleaseGovernanceEvidence(fixture);
+  const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
+  assert.equal(report.overall, "FAIL");
+  assert.equal(failedChecks.has("RGP-APPROVAL-OUTCOME"), true);
+});
+
+test("release governance rejects invalid lifecycle ordering", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const fixtureRaw = await readFile(
+    resolve(repoRoot, "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+    "utf8"
+  );
+  const fixture = JSON.parse(fixtureRaw);
+  fixture.lifecycle = [
+    { stage: "policy_evaluation", at: "2026-03-31T00:00:00.500Z" },
+    { stage: "preflight_declaration", at: "2026-03-31T00:00:00.000Z" },
+    { stage: "execution_authorization", at: "2026-03-31T00:00:01.000Z" },
+    { stage: "post_execution_attestation", at: "2026-03-31T00:00:02.000Z" }
+  ];
+  const report = evaluateReleaseGovernanceEvidence(fixture);
+  const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
+  assert.equal(report.overall, "FAIL");
+  assert.equal(failedChecks.has("RGP-LIFECYCLE-ORDER"), true);
+});
+
+test("release governance validate rejects forged report with fabricated checks", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const contractRaw = await readFile(resolve(repoRoot, "conformance-kit/expected/release-governance.contract.json"), "utf8");
+  const contract = JSON.parse(contractRaw);
+  const forged = {
+    overall: "PASS",
+    lifecycleStages: [
+      "preflight_declaration",
+      "policy_evaluation",
+      "execution_authorization",
+      "post_execution_attestation"
+    ],
+    policy: {
+      require_approval: false,
+      blocked_paths: ["**/*.map"]
+    },
+    signing: {
+      jwks: { keys: [] }
+    },
+    receipt: {
+      schemaVersion: "1.0.0",
+      receipt_id: "TR-1",
+      intent_id: "TI-1",
+      decision_id: "TD-1",
+      execution_status: "executed",
+      captured_at: "2026-03-31T00:00:02.000Z",
+      signature: {
+        alg: "Ed25519",
+        kid: "forged",
+        sig: "forged",
+        canonicalization: "ATP-JCS-SORTED-UTF8"
+      },
+      occurred_at: "2026-03-31T00:00:00.000Z",
+      received_at: "2026-03-31T00:00:01.000Z",
+      sealed_at: "2026-03-31T00:00:02.000Z",
+      event_snapshot: {
+        release: {
+          tarball_sha256: "a".repeat(64),
+          manifest_sha256: "b".repeat(64),
+          manifest_paths: ["dist/index.js.map"],
+          publish_attempted: true
+        }
+      },
+      event_snapshot_hash: "a".repeat(64),
+      correlation_id: "forged:1:0",
+      intent: {
+        intent_id: "TI-1",
+        actor_id: "forged",
+        connector: "forged",
+        action: "registry.publish",
+        action_class: "write_high",
+        target: {},
+        context: {
+          package_name: "@forged/pkg",
+          package_version: "1.0.0",
+          expected_tarball_sha256: "a".repeat(64),
+          expected_manifest_sha256: "b".repeat(64)
+        },
+        governance_profile: "release_governance_profile",
+        requested_at: "2026-03-31T00:00:00.000Z"
+      },
+      decision: {
+        decision_id: "TD-1",
+        intent_id: "TI-1",
+        outcome: "allow",
+        reason_code: "forged",
+        decided_at: "2026-03-31T00:00:01.000Z"
+      }
+    },
+    checks: contract.requiredChecks.map((id) => ({ id, ok: true, message: "forged pass" }))
+  };
+  const validation = validateReleaseGovernanceReport(forged, contract);
+  assert.equal(validation.ok, false);
+});
+
 test("release governance rejects publish attempt without passing decision gate", async () => {
   const repoRoot = resolve(process.cwd(), "..", "..");
   const fixtureRaw = await readFile(
