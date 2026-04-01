@@ -1,0 +1,21 @@
+{
+  "name": "@atp/release-guard",
+  "version": "0.1.0",
+  "description": "Reference CLI for ATP release governance process profile (non-normative).",
+  "license": "Apache-2.0",
+  "author": "James Everest <james@transientintelligence.com> (https://transientintelligence.com)",
+  "type": "module",
+  "bin": {
+    "atp-release-guard": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test ./test/smoke.test.mjs"
+  }
+}

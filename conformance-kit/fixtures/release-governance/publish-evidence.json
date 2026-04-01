@@ -1,0 +1,64 @@
+{
+  "runId": "release-governance-publish-001",
+  "sessionId": "release-governance-publish-001",
+  "runStatus": "success",
+  "haltReason": "none",
+  "events": [
+    {
+      "eventType": "tool_call_requested",
+      "capturedAt": "2026-03-31T00:00:00.000Z"
+    },
+    {
+      "eventType": "tool_call_executed",
+      "capturedAt": "2026-03-31T00:00:01.000Z"
+    },
+    {
+      "eventType": "run_end",
+      "capturedAt": "2026-03-31T00:00:02.000Z"
+    }
+  ],
+  "lifecycle": [
+    {
+      "stage": "preflight_declaration",
+      "at": "2026-03-31T00:00:00.000Z"
+    },
+    {
+      "stage": "policy_evaluation",
+      "at": "2026-03-31T00:00:00.500Z"
+    },
+    {
+      "stage": "execution_authorization",
+      "at": "2026-03-31T00:00:01.000Z"
+    },
+    {
+      "stage": "post_execution_attestation",
+      "at": "2026-03-31T00:00:02.000Z"
+    }
+  ],
+  "intentContext": {
+    "package_name": "@acme/example-package",
+    "package_version": "1.2.3",
+    "expected_tarball_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "expected_manifest_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "commit_sha": "0835c51",
+    "tag": "v1.2.3",
+    "publish_target": "https://registry.npmjs.org"
+  },
+  "policy": {
+    "require_approval": false,
+    "blocked_paths": [
+      "src/internal/",
+      "secrets/"
+    ]
+  },
+  "release": {
+    "tarball_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "manifest_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "manifest_paths": [
+      "package.json",
+      "README.md",
+      "dist/index.mjs"
+    ],
+    "publish_attempted": true
+  }
+}

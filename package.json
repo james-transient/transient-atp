@@ -13,10 +13,12 @@
     "conformance:proof": "node scripts/conformance-proof-harness.mjs",
     "conformance:proof:fresh": "node scripts/conformance-proof-harness.mjs --openclaw-frames conformance-kit/fixtures/openclaw/gateway-frames-live.json",
     "conformance:kit": "node scripts/conformance-kit-validate.mjs",
+    "conformance:release": "node scripts/conformance-release-governance.mjs",
     "conformance:industry": "node scripts/conformance-industry-gate.mjs",
     "conformance:industry:strict": "node scripts/conformance-industry-gate.mjs --industry-contract conformance-kit/expected/industry-gate.strict.json",
     "conformance:soak": "node scripts/conformance-soak-fuzz.mjs",
     "test:spec": "npm run -w @atp/spec test",
-    "test:cli": "npm run -w @atp/conformance-cli test"
+    "test:cli": "npm run -w @atp/conformance-cli test",
+    "test:release-guard": "npm run -w @atp/release-guard test"
   }
 }

@@ -20,6 +20,8 @@ jobs:
         run: npm run test:spec
       - name: Run unit tests (conformance-cli)
         run: npm run test:cli
+      - name: Run unit tests (release-guard)
+        run: npm run test:release-guard
       - name: Run conformance kit
         run: npm run conformance:kit
       - name: Run industry gate

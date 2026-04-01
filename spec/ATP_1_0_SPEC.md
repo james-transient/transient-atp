@@ -161,6 +161,14 @@ Conformance for ATP 1.0 is evaluated through:
 - `conformance/ATP_1_0_CONFORMANCE_CHECKLIST.md`
 - `conformance-kit/expected/contract.json`
 
+## Application Profiles
+
+ATP 1.0 MAY be applied to domain-specific or workflow-specific governance contexts while preserving the same canonical object lifecycle and invariants.
+
+The release governance profile is defined in:
+
+- `spec/ATP_1_0_RELEASE_GOVERNANCE_PROFILE.md`
+
 ---
 
 © 2026 Transient Intelligence Ltd. Agent Transaction Protocol (ATP) is a specification created and published by Transient Intelligence Ltd. Licensed under the Apache License, Version 2.0.

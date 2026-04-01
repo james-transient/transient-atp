@@ -5,6 +5,7 @@ import { generateProofReport } from "./lib/proof-harness.mjs";
 import { validateConformanceReport } from "./lib/contract-validate.mjs";
 import { runConformanceKit } from "./lib/conformance-kit.mjs";
 import { runIndustryGate } from "./lib/industry-gate.mjs";
+import { runReleaseGovernanceProfile, validateReleaseGovernanceReport } from "./lib/release-governance.mjs";
 
 function parseArg(argv, flag, fallback = undefined) {
   const idx = argv.indexOf(flag);
@@ -22,6 +23,8 @@ function usage() {
   validate --contract <path> --report <path>
   kit
   industry
+  release-profile [--evidence <path>] [--report <path>]
+  release-validate --contract <path> --report <path>
 `);
 }
 
@@ -68,6 +71,30 @@ async function main() {
     const result = await runIndustryGate({
       industryContractPath: parseArg(argv, "--industry-contract", "conformance-kit/expected/industry-gate.json")
     });
+    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) process.exitCode = 1;
+    return;
+  }
+
+  if (command === "release-profile") {
+    const result = await runReleaseGovernanceProfile({
+      evidencePath: parseArg(argv, "--evidence", "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+      reportOutPath: parseArg(argv, "--report", "conformance-kit/artifacts/latest-release-governance.json")
+    });
+    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) process.exitCode = 1;
+    return;
+  }
+
+  if (command === "release-validate") {
+    const contractPath = parseArg(argv, "--contract");
+    const reportPath = parseArg(argv, "--report");
+    if (!contractPath || !reportPath) {
+      throw new Error("release-validate requires --contract and --report");
+    }
+    const contract = JSON.parse(await readFile(resolve(process.cwd(), contractPath), "utf8"));
+    const report = JSON.parse(await readFile(resolve(process.cwd(), reportPath), "utf8"));
+    const result = validateReleaseGovernanceReport(report, contract);
     console.log(JSON.stringify(result, null, 2));
     if (!result.ok) process.exitCode = 1;
     return;

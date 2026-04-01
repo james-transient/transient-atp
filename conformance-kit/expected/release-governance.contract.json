@@ -1,0 +1,18 @@
+{
+  "requiredOverall": "PASS",
+  "requiredLifecycleStages": [
+    "preflight_declaration",
+    "policy_evaluation",
+    "execution_authorization",
+    "post_execution_attestation"
+  ],
+  "requiredChecks": [
+    "RGP-INTENT-ACTION",
+    "RGP-LIFECYCLE-REQUIRED",
+    "RGP-DIGEST-FORMAT",
+    "RGP-DIGEST-BINDING",
+    "RGP-BLOCKED-PATHS",
+    "RGP-DECISION-GATE",
+    "RGP-ATP-L1-RECEIPT"
+  ]
+}

@@ -22,6 +22,7 @@ From repository root:
 
 ```bash
 npm run conformance:kit
+npm run conformance:release
 ```
 
 For the stricter industry-grade gate:
@@ -43,6 +44,7 @@ npm exec -- atp-conformance industry
 - `conformance-kit/artifacts/latest-validation.json`
 - `conformance-kit/artifacts/latest-industry-gate.json`
 - `conformance-kit/artifacts/latest-digests.json`
+- `conformance-kit/artifacts/latest-release-governance.json`
 
 ## Pass Criteria
 
@@ -63,11 +65,13 @@ The expected conformance contract is defined in:
 - `conformance-kit/expected/contract.json`
 - `conformance-kit/expected/industry-gate.json`
 - `conformance-kit/expected/industry-gate.strict.json`
+- `conformance-kit/expected/release-governance.contract.json`
 
 Validate an existing report against the contract:
 
 ```bash
 npm exec -- atp-conformance validate --contract conformance-kit/expected/contract.json --report conformance-kit/artifacts/latest-report.json
+npm exec -- atp-conformance release-validate --contract conformance-kit/expected/release-governance.contract.json --report conformance-kit/artifacts/latest-release-governance.json
 ```
 
 `industry-gate.json` controls stricter gate behavior, including:

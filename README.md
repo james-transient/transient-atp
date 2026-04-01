@@ -40,6 +40,21 @@ Receipts are signed with Ed25519, tied to a public key published at `/.well-know
 | `conformance-kit/` | Reproducible conformance contracts and verification artifacts |
 | `packages/spec` | `@atp/spec` — protocol constants, JSON schemas, Ed25519 signing, replay guard |
 | `packages/conformance-cli` | `@atp/conformance-cli` — conformance runner and validator CLI |
+| `packages/release-guard` | `@atp/release-guard` — non-normative reference CLI for release governance process profile |
+
+## Application profiles
+
+ATP is a protocol standard. Application profiles reuse the same `Intent` -> `Decision` -> `Receipt` model for specific high-impact workflows.
+
+The release governance process profile applies ATP to governed package publishing and release actions:
+
+- Declared publish intent
+- Policy decision gate
+- Signed receipt bound to release artifact evidence
+
+ATP does not replace packaging hygiene controls. It makes high-impact release actions harder to execute silently and easier to audit.
+
+See [`spec/ATP_1_0_RELEASE_GOVERNANCE_PROFILE.md`](./spec/ATP_1_0_RELEASE_GOVERNANCE_PROFILE.md).
 
 ## Getting started
 

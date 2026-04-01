@@ -6,12 +6,16 @@
 - "Conformance includes scenario coverage for allow, approve, deny and executed, blocked, expired, error."
 - "The conformance process is reproducible with committed fixtures and local execution."
 - "ATP 1.0 conformance evidence is produced by the published conformance kit and artifacts."
+- "ATP release governance profile requires declared intent, policy decision, and receipt evidence for governed publish actions."
+- "ATP can make high-risk publish actions harder to perform silently and easier to audit."
 
 ## Prohibited Claims
 
 - "Formally certified by an independent standards body" (unless independently verified and published).
 - "Guaranteed secure in all environments."
 - "Universally interoperable across all agent frameworks" (unless proven and documented with evidence).
+- "ATP guarantees no code or data leaks."
+- "ATP replaces package manager hygiene such as files lists or ignore configuration."
 
 ## External Messaging Rule
 

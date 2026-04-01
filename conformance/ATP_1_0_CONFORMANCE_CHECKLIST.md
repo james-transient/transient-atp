@@ -86,6 +86,17 @@ The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, RECOMMENDED, 
 - `ATP-L1-CST-001`: Implementations MAY include a `cost` object with `amount` and `currency` fields.
 - `ATP-L1-CST-002`: `cost.amount` MUST be a decimal string if present.
 
+### Release Governance Process Profile (Application Profile)
+
+- `ATP-L1-RGP-001`: For governed `registry.publish` actions, implementations MUST emit ATP `Intent`, `Decision`, and `Receipt` objects.
+- `ATP-L1-RGP-002`: The lifecycle stages `preflight declaration`, `policy evaluation`, `execution authorization`, and `post-execution attestation` MUST be represented in evidence.
+- `ATP-L1-RGP-003`: Where policy requires explicit approval, an `approval gate` stage MUST be represented and execution MUST NOT proceed before approval resolution.
+- `ATP-L1-RGP-004`: `intent.context` MUST include `package_name`, `package_version`, `expected_tarball_sha256`, and `expected_manifest_sha256` for `registry.publish`.
+- `ATP-L1-RGP-005`: Release profile receipts MUST satisfy ATP-L1 receipt invariants.
+- `ATP-L1-RGP-006`: Digest binding MUST hold between intent and receipt evidence (`expected_tarball_sha256 == release.tarball_sha256` and `expected_manifest_sha256 == release.manifest_sha256`).
+- `ATP-L1-RGP-007`: If blocked path policy is configured, published manifest paths MUST NOT include blocked paths.
+- `ATP-L1-RGP-008`: Implementations MUST fail closed on deny decisions for publish actions.
+
 ## Verification Artifacts
 
 - `conformance-kit/artifacts/latest-report.json`

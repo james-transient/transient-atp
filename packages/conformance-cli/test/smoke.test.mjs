@@ -6,6 +6,10 @@ import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createSampleReceipt, validateReceiptATP } from "../src/lib/receipt.mjs";
 import { validateConformanceReport } from "../src/lib/contract-validate.mjs";
+import {
+  evaluateReleaseGovernanceEvidence,
+  validateReleaseGovernanceReport
+} from "../src/lib/release-governance.mjs";
 import { generateSigningKeyPair, signReceipt, verifyReceiptSignature } from "@atp/spec";
 
 test("Ed25519 sign and verify round-trip on a valid receipt", () => {
@@ -416,4 +420,74 @@ test("industry gate rejects malformed requireIndependentVerifier contract typing
   );
   assert.notEqual(run.status, 0);
   assert.match(String(run.stdout ?? ""), /INDEPENDENT-VERIFIER-HOOK/);
+});
+
+test("release governance profile command produces PASS report", () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const run = spawnSync(process.execPath, ["packages/conformance-cli/src/cli.mjs", "release-profile"], {
+    cwd: repoRoot,
+    encoding: "utf8"
+  });
+  assert.equal(run.status, 0);
+  const parsed = JSON.parse(String(run.stdout ?? "{}"));
+  assert.equal(parsed.ok, true);
+});
+
+test("release governance report validates against release contract", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const run = spawnSync(process.execPath, ["packages/conformance-cli/src/cli.mjs", "release-profile"], {
+    cwd: repoRoot,
+    encoding: "utf8"
+  });
+  assert.equal(run.status, 0);
+  const reportRaw = await readFile(resolve(repoRoot, "conformance-kit/artifacts/latest-release-governance.json"), "utf8");
+  const contractRaw = await readFile(resolve(repoRoot, "conformance-kit/expected/release-governance.contract.json"), "utf8");
+  const report = JSON.parse(reportRaw);
+  const contract = JSON.parse(contractRaw);
+  const validation = validateReleaseGovernanceReport(report, contract);
+  assert.equal(validation.ok, true);
+});
+
+test("release governance rejects digest mismatch", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const fixtureRaw = await readFile(
+    resolve(repoRoot, "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+    "utf8"
+  );
+  const fixture = JSON.parse(fixtureRaw);
+  fixture.release.tarball_sha256 = "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+  const report = evaluateReleaseGovernanceEvidence(fixture);
+  const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
+  assert.equal(report.overall, "FAIL");
+  assert.equal(failedChecks.has("RGP-DIGEST-BINDING"), true);
+});
+
+test("release governance rejects blocked path exposure", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const fixtureRaw = await readFile(
+    resolve(repoRoot, "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+    "utf8"
+  );
+  const fixture = JSON.parse(fixtureRaw);
+  fixture.release.manifest_paths.push("src/internal/secret-export.mjs");
+  const report = evaluateReleaseGovernanceEvidence(fixture);
+  const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
+  assert.equal(report.overall, "FAIL");
+  assert.equal(failedChecks.has("RGP-BLOCKED-PATHS"), true);
+});
+
+test("release governance rejects publish attempt without passing decision gate", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const fixtureRaw = await readFile(
+    resolve(repoRoot, "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+    "utf8"
+  );
+  const fixture = JSON.parse(fixtureRaw);
+  fixture.haltReason = "blocked_by_policy";
+  fixture.runStatus = "halted";
+  fixture.release.publish_attempted = true;
+  const report = evaluateReleaseGovernanceEvidence(fixture);
+  const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
+  assert.equal(report.overall, "FAIL");
+  assert.equal(failedChecks.has("RGP-DECISION-GATE"), true);
 });
