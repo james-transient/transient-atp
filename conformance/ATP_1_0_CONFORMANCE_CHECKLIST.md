@@ -96,6 +96,7 @@ The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, RECOMMENDED, 
 - `ATP-L1-RGP-006`: Digest binding MUST hold between intent and receipt evidence (`expected_tarball_sha256 == release.tarball_sha256` and `expected_manifest_sha256 == release.manifest_sha256`).
 - `ATP-L1-RGP-007`: If blocked path policy is configured, published manifest paths MUST NOT include blocked paths.
 - `ATP-L1-RGP-008`: Implementations MUST fail closed on deny decisions for publish actions.
+- `ATP-L1-RGP-009`: Release profile receipts MUST use Ed25519 object signatures and MUST NOT use deprecated legacy `sha256:` signature strings.
 
 ## Verification Artifacts
 

@@ -82,6 +82,8 @@ Digest binding MUST hold:
 
 If a blocked path policy is configured, `event_snapshot.release.manifest_paths` MUST NOT contain blocked paths.
 
+Release profile receipts MUST use Ed25519 object signatures (`signature.alg == "Ed25519"`). Deprecated legacy `sha256:` string signatures MUST NOT be used for this profile.
+
 ## Conformance Notes
 
 Conformance to this profile is additive to ATP-L1. A release profile implementation is conforming only when:

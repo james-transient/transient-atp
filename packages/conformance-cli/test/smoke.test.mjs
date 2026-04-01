@@ -446,6 +446,8 @@ test("release governance report validates against release contract", async () =>
   const contract = JSON.parse(contractRaw);
   const validation = validateReleaseGovernanceReport(report, contract);
   assert.equal(validation.ok, true);
+  const signingCheck = (Array.isArray(report.checks) ? report.checks : []).find((item) => item.id === "RGP-NONDEPRECATED-SIGNING");
+  assert.equal(Boolean(signingCheck?.ok), true);
 });
 
 test("release governance rejects digest mismatch", async () => {
@@ -470,6 +472,21 @@ test("release governance rejects blocked path exposure", async () => {
   );
   const fixture = JSON.parse(fixtureRaw);
   fixture.release.manifest_paths.push("src/internal/secret-export.mjs");
+  const report = evaluateReleaseGovernanceEvidence(fixture);
+  const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
+  assert.equal(report.overall, "FAIL");
+  assert.equal(failedChecks.has("RGP-BLOCKED-PATHS"), true);
+});
+
+test("release governance rejects blocked path exposure using glob pattern", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const fixtureRaw = await readFile(
+    resolve(repoRoot, "conformance-kit/fixtures/release-governance/publish-evidence.json"),
+    "utf8"
+  );
+  const fixture = JSON.parse(fixtureRaw);
+  fixture.release.manifest_paths.push("dist/index.js.map");
+  fixture.policy.blocked_paths = ["**/*.map"];
   const report = evaluateReleaseGovernanceEvidence(fixture);
   const failedChecks = new Set(report.checks.filter((entry) => !entry.ok).map((entry) => entry.id));
   assert.equal(report.overall, "FAIL");

@@ -1,6 +1,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { hashEventSnapshot, createSampleReceipt, validateReceiptATP } from "./receipt.mjs";
+import { generateSigningKeyPair, signReceipt } from "@atp/spec";
 
 const REQUIRED_LIFECYCLE_STAGES = Object.freeze([
   "preflight_declaration",
@@ -16,11 +17,32 @@ function isHexSha256(value) {
 function hasBlockedPath(manifestPaths, blockedPrefixes) {
   const paths = Array.isArray(manifestPaths) ? manifestPaths : [];
   const blocked = Array.isArray(blockedPrefixes) ? blockedPrefixes : [];
-  return paths.some((item) => blocked.some((prefix) => String(item).startsWith(String(prefix))));
+  return paths.some((item) => blocked.some((prefix) => pathMatchesPolicy(String(item), String(prefix))));
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function globToRegex(pattern) {
+  const placeholder = "\u0000DOUBLE_STAR\u0000";
+  const withPlaceholders = pattern.replace(/\*\*/g, placeholder);
+  const escaped = escapeRegex(withPlaceholders);
+  const singleStar = escaped.replace(/\*/g, "[^/]*");
+  const doubleStar = singleStar.replaceAll(placeholder, ".*");
+  return new RegExp(`^${doubleStar}$`);
+}
+
+function pathMatchesPolicy(path, policyPattern) {
+  if (!policyPattern) return false;
+  if (policyPattern.includes("*")) {
+    return globToRegex(policyPattern).test(path);
+  }
+  return path.startsWith(policyPattern);
 }
 
 function buildReleaseReceipt(evidence) {
-  const receipt = createSampleReceipt({
+  const baseReceipt = createSampleReceipt({
     runId: evidence.runId,
     sessionId: evidence.sessionId,
     runStatus: evidence.runStatus,
@@ -29,7 +51,7 @@ function buildReleaseReceipt(evidence) {
     action: "registry.publish"
   });
 
-  receipt.intent.context = {
+  baseReceipt.intent.context = {
     package_name: evidence.intentContext?.package_name,
     package_version: evidence.intentContext?.package_version,
     expected_tarball_sha256: evidence.intentContext?.expected_tarball_sha256,
@@ -39,16 +61,16 @@ function buildReleaseReceipt(evidence) {
     publish_target: evidence.intentContext?.publish_target
   };
 
-  receipt.event_snapshot.release = {
+  baseReceipt.event_snapshot.release = {
     tarball_sha256: evidence.release?.tarball_sha256,
     manifest_sha256: evidence.release?.manifest_sha256,
     manifest_paths: Array.isArray(evidence.release?.manifest_paths) ? evidence.release.manifest_paths : [],
     publish_attempted: Boolean(evidence.release?.publish_attempted)
   };
 
-  receipt.event_snapshot_hash = hashEventSnapshot(receipt.event_snapshot);
-  receipt.signature = `sha256:${receipt.event_snapshot_hash}`;
-  return receipt;
+  baseReceipt.event_snapshot_hash = hashEventSnapshot(baseReceipt.event_snapshot);
+  const keyPair = generateSigningKeyPair();
+  return signReceipt(baseReceipt, keyPair.privateKey, "release-governance-profile-key");
 }
 
 function evaluateCheck(id, ok, message) {
@@ -112,7 +134,7 @@ export function evaluateReleaseGovernanceEvidence(evidence) {
     evaluateCheck(
       "RGP-BLOCKED-PATHS",
       !hasBlockedPath(receipt?.event_snapshot?.release?.manifest_paths, evidence?.policy?.blocked_paths),
-      "manifest paths must not include blocked path prefixes"
+      "manifest paths must not include blocked path policy matches"
     )
   );
 
@@ -136,6 +158,15 @@ export function evaluateReleaseGovernanceEvidence(evidence) {
       "RGP-ATP-L1-RECEIPT",
       atpValidation.ok,
       atpValidation.ok ? "receipt satisfies ATP-L1 invariants" : "receipt violates ATP-L1 invariants"
+    )
+  );
+  checks.push(
+    evaluateCheck(
+      "RGP-NONDEPRECATED-SIGNING",
+      typeof receipt?.signature === "object" &&
+        receipt?.signature?.alg === "Ed25519" &&
+        atpValidation.warnings.length === 0,
+      "release profile receipts must use Ed25519 object signature with no deprecation warnings"
     )
   );
 
