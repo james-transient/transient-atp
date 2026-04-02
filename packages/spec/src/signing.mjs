@@ -46,13 +46,30 @@ export function signReceipt(receipt, privateKeyPem, keyId) {
   };
 }
 
-export function verifyReceiptSignature(receipt, publicKeyPem) {
+export function verifyReceiptSignature(receipt, publicKeyPem, options = {}) {
   const sig = receipt?.signature;
   if (!sig || typeof sig !== "object") {
     return { ok: false, reason: "receipt_invalid_signature", detail: "signature object missing" };
   }
   if (sig.alg !== ATP_SIGNING_ALGORITHM) {
     return { ok: false, reason: "receipt_invalid_signature", detail: `unsupported algorithm '${sig.alg}'` };
+  }
+  if (sig.canonicalization !== "ATP-JCS-SORTED-UTF8") {
+    return {
+      ok: false,
+      reason: "receipt_invalid_signature",
+      detail: "canonicalization must be ATP-JCS-SORTED-UTF8"
+    };
+  }
+  if (typeof sig.kid !== "string" || sig.kid.trim().length === 0) {
+    return { ok: false, reason: "receipt_invalid_signature", detail: "kid field missing or empty" };
+  }
+  if (typeof options?.expectedKid === "string" && options.expectedKid.trim().length > 0 && sig.kid !== options.expectedKid) {
+    return {
+      ok: false,
+      reason: "receipt_invalid_signature",
+      detail: `kid mismatch expected '${options.expectedKid}' but got '${sig.kid}'`
+    };
   }
   if (typeof sig.sig !== "string" || !sig.sig.trim()) {
     return { ok: false, reason: "receipt_invalid_signature", detail: "sig field missing or empty" };

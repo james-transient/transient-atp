@@ -91,23 +91,8 @@ test("publish command rejects deny decision", async () => {
   const packageDir = await createFixturePackage();
   const checkPath = resolve(packageDir, ".atp-check.json");
   const decisionPath = resolve(packageDir, ".atp-decision.json");
-  await writeFile(
-    checkPath,
-    JSON.stringify(
-      {
-        ok: true,
-        package: { name: "@atp/example", version: "1.0.0" },
-        release: {
-          tarball_sha256: "a".repeat(64),
-          manifest_sha256: "b".repeat(64),
-          manifest_paths: ["dist/index.mjs"]
-        },
-        policy: { blocked_paths: [], violations: [] }
-      },
-      null,
-      2
-    )
-  );
+  const check = await runCheckCommand(["--package-dir", packageDir, "--out", checkPath]);
+  assert.equal(check.ok, true);
   await writeFile(
     decisionPath,
     JSON.stringify(
@@ -115,10 +100,10 @@ test("publish command rejects deny decision", async () => {
         intent: {
           intent_id: "TI-123",
           context: {
-            package_name: "@atp/example",
-            package_version: "1.0.0",
-            expected_tarball_sha256: "a".repeat(64),
-            expected_manifest_sha256: "b".repeat(64)
+            package_name: check.package.name,
+            package_version: check.package.version,
+            expected_tarball_sha256: check.release.tarball_sha256,
+            expected_manifest_sha256: check.release.manifest_sha256
           }
         },
         decision: { decision_id: "TD-123", intent_id: "TI-123", outcome: "deny" }
@@ -137,23 +122,8 @@ test("publish command enforces explicit approval for approve decisions", async (
   const packageDir = await createFixturePackage();
   const checkPath = resolve(packageDir, ".atp-check.json");
   const decisionPath = resolve(packageDir, ".atp-decision.json");
-  await writeFile(
-    checkPath,
-    JSON.stringify(
-      {
-        ok: true,
-        package: { name: "@atp/example", version: "1.0.0" },
-        release: {
-          tarball_sha256: "a".repeat(64),
-          manifest_sha256: "b".repeat(64),
-          manifest_paths: ["dist/index.mjs"]
-        },
-        policy: { blocked_paths: [], violations: [] }
-      },
-      null,
-      2
-    )
-  );
+  const check = await runCheckCommand(["--package-dir", packageDir, "--out", checkPath]);
+  assert.equal(check.ok, true);
   await writeFile(
     decisionPath,
     JSON.stringify(
@@ -161,10 +131,10 @@ test("publish command enforces explicit approval for approve decisions", async (
         intent: {
           intent_id: "TI-123",
           context: {
-            package_name: "@atp/example",
-            package_version: "1.0.0",
-            expected_tarball_sha256: "a".repeat(64),
-            expected_manifest_sha256: "b".repeat(64)
+            package_name: check.package.name,
+            package_version: check.package.version,
+            expected_tarball_sha256: check.release.tarball_sha256,
+            expected_manifest_sha256: check.release.manifest_sha256
           }
         },
         decision: { decision_id: "TD-123", intent_id: "TI-123", outcome: "approve" }
@@ -184,24 +154,8 @@ test("publish command emits receipt bound to check digests", async () => {
   const checkPath = resolve(packageDir, ".atp-check.json");
   const decisionPath = resolve(packageDir, ".atp-decision.json");
   const outPath = resolve(packageDir, ".atp-publish.json");
-
-  await writeFile(
-    checkPath,
-    JSON.stringify(
-      {
-        ok: true,
-        package: { name: "@atp/example", version: "1.0.0" },
-        release: {
-          tarball_sha256: "a".repeat(64),
-          manifest_sha256: "b".repeat(64),
-          manifest_paths: ["dist/index.mjs"]
-        },
-        policy: { blocked_paths: [], violations: [] }
-      },
-      null,
-      2
-    )
-  );
+  const check = await runCheckCommand(["--package-dir", packageDir, "--out", checkPath]);
+  assert.equal(check.ok, true);
   await writeFile(
     decisionPath,
     JSON.stringify(
@@ -209,10 +163,10 @@ test("publish command emits receipt bound to check digests", async () => {
         intent: {
           intent_id: "TI-123",
           context: {
-            package_name: "@atp/example",
-            package_version: "1.0.0",
-            expected_tarball_sha256: "a".repeat(64),
-            expected_manifest_sha256: "b".repeat(64)
+            package_name: check.package.name,
+            package_version: check.package.version,
+            expected_tarball_sha256: check.release.tarball_sha256,
+            expected_manifest_sha256: check.release.manifest_sha256
           }
         },
         decision: { decision_id: "TD-123", intent_id: "TI-123", outcome: "allow" }
@@ -234,10 +188,28 @@ test("publish command emits receipt bound to check digests", async () => {
   ]);
   assert.equal(result.ok, true);
   assert.equal(result.receipt.receipt_id, "TR-123");
-  assert.equal(result.receipt.event_snapshot.release.tarball_sha256, "a".repeat(64));
-  assert.equal(result.receipt.event_snapshot.release.manifest_sha256, "b".repeat(64));
+  assert.equal(typeof result.receipt.signature, "object");
+  assert.equal(result.receipt.signature.alg, "Ed25519");
+  assert.equal(result.receipt.signature.canonicalization, "ATP-JCS-SORTED-UTF8");
+  assert.equal(result.receipt.event_snapshot.release.tarball_sha256, check.release.tarball_sha256);
+  assert.equal(result.receipt.event_snapshot.release.manifest_sha256, check.release.manifest_sha256);
   const saved = JSON.parse(await readFile(outPath, "utf8"));
   assert.equal(saved.receipt.decision_id, "TD-123");
+});
+
+test("publish command rejects stale check evidence when package content changed post-check", async () => {
+  const packageDir = await createFixturePackage();
+  const checkPath = resolve(packageDir, ".atp-check.json");
+  const decisionPath = resolve(packageDir, ".atp-decision.json");
+  const check = await runCheckCommand(["--package-dir", packageDir, "--out", checkPath]);
+  assert.equal(check.ok, true);
+  const decision = await runDecideCommand(["--check-report", checkPath, "--out", decisionPath]);
+  assert.equal(decision.ok, true);
+  await writeFile(resolve(packageDir, "dist/index.mjs"), "export const ok = false;\n");
+  await assert.rejects(
+    () => runPublishCommand(["--package-dir", packageDir, "--check-report", checkPath, "--decision", decisionPath]),
+    /changed since check report \(stale evidence\)/i
+  );
 });
 
 test("publish command rejects digest mismatch between decision intent and check report", async () => {

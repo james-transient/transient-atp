@@ -161,7 +161,7 @@ export function validateReceiptATP(receipt) {
     s.alg === "Ed25519" &&
     typeof s.kid === "string" && s.kid.trim().length > 0 &&
     typeof s.sig === "string" && s.sig.trim().length > 0 &&
-    typeof s.canonicalization === "string" && s.canonicalization.trim().length > 0;
+    s.canonicalization === "ATP-JCS-SORTED-UTF8";
   const isLegacySig = (s) => typeof s === "string" && /^sha256:[a-f0-9]{64}$/.test(s);
   if (!isEd25519Sig(sig) && !isLegacySig(sig)) {
     add(

@@ -15,6 +15,9 @@
     "src",
     "README.md"
   ],
+  "dependencies": {
+    "@atp/spec": "1.0.0"
+  },
   "scripts": {
     "test": "node --test ./test/smoke.test.mjs"
   }

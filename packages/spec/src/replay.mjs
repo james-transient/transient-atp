@@ -1,5 +1,6 @@
 const ATP_RECEIPT_VALIDATION_CODES = {
   MISSING_REQUIRED_FIELD: "receipt_missing_required_field",
+  INVALID_DATETIME_FORMAT: "receipt_invalid_datetime_format",
   REPLAY_DETECTED: "receipt_replay_detected",
   OUTSIDE_WINDOW: "receipt_outside_window"
 };
@@ -27,16 +28,21 @@ export class ReplayGuard {
     }
 
     const sealedAt = Date.parse(String(receipt?.sealed_at ?? ""));
-    if (Number.isFinite(sealedAt)) {
-      const earliest = now - this.#windowMs;
-      const latest = now + this.#skewMs;
-      if (sealedAt < earliest || sealedAt > latest) {
-        return {
-          ok: false,
-          reason: ATP_RECEIPT_VALIDATION_CODES.OUTSIDE_WINDOW,
-          detail: `sealed_at ${receipt.sealed_at} is outside observation window`
-        };
-      }
+    if (!Number.isFinite(sealedAt)) {
+      return {
+        ok: false,
+        reason: ATP_RECEIPT_VALIDATION_CODES.INVALID_DATETIME_FORMAT,
+        detail: `sealed_at ${String(receipt?.sealed_at ?? "")} must be a valid date-time`
+      };
+    }
+    const earliest = now - this.#windowMs;
+    const latest = now + this.#skewMs;
+    if (sealedAt < earliest || sealedAt > latest) {
+      return {
+        ok: false,
+        reason: ATP_RECEIPT_VALIDATION_CODES.OUTSIDE_WINDOW,
+        detail: `sealed_at ${receipt.sealed_at} is outside observation window`
+      };
     }
 
     if (this.#seen.has(receiptId)) {

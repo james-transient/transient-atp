@@ -32,6 +32,7 @@ function sampleRuntimes(frames) {
         attestation: {
           trustReceiptSigned: true,
           trustReceiptPublicKey: keyPair.publicKey,
+          trustReceiptKeyId: `harness-${runId}`,
           keyDistribution: {
             published: true,
             endpoint: "/.well-known/atp-keys"

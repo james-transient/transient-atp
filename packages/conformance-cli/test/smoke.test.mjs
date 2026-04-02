@@ -92,6 +92,27 @@ test("legacy sha256 signature produces deprecation warning, not error", () => {
   assert.equal(result.warnings[0].code, "receipt_deprecated_legacy_signature");
 });
 
+test("receipt validation rejects Ed25519 signature with non-ATP canonicalization metadata", () => {
+  const { privateKey } = generateSigningKeyPair();
+  const receipt = createSampleReceipt({
+    runId: "invalid-canonicalization",
+    sessionId: "invalid-canonicalization",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(receipt, privateKey, "canon-key-001");
+  signed.signature.canonicalization = "NOT-ATP";
+  const result = validateReceiptATP(signed);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_invalid_signature_format"), true);
+});
+
 test("runtime conformance fails forged legacy signature even when trustReceiptSigned is true", () => {
   const receipt = createSampleReceipt({
     runId: "forged-legacy",
@@ -145,6 +166,7 @@ test("runtime conformance requires cryptographic verification for PASS", () => {
       attestation: {
         trustReceiptSigned: true,
         trustReceiptPublicKey: publicKey,
+        trustReceiptKeyId: "runtime-key-001",
         keyDistribution: { published: true, endpoint: "/.well-known/atp-keys" },
         replayProtection: { enabled: true, observationWindowSeconds: 300 },
         trustReceipt: signed
@@ -153,6 +175,39 @@ test("runtime conformance requires cryptographic verification for PASS", () => {
   });
   assert.equal(result.atpL1.signatureVerified, true);
   assert.equal(result.passed, true);
+});
+
+test("runtime conformance fails when attested key id does not match receipt signature kid", () => {
+  const { privateKey, publicKey } = generateSigningKeyPair();
+  const receipt = createSampleReceipt({
+    runId: "runtime-kid-mismatch",
+    sessionId: "runtime-kid-mismatch",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(receipt, privateKey, "runtime-kid-a");
+  const result = evaluateRuntimeConformance({
+    runtimeId: "runtime-kid-mismatch",
+    requiredLevel: "CLASSIFY_ONLY",
+    requiredAtpL1: true,
+    evidence: {
+      attestation: {
+        trustReceiptSigned: true,
+        trustReceiptPublicKey: publicKey,
+        trustReceiptKeyId: "runtime-kid-b",
+        keyDistribution: { published: true, endpoint: "/.well-known/atp-keys" },
+        replayProtection: { enabled: true, observationWindowSeconds: 300 },
+        trustReceipt: signed
+      }
+    }
+  });
+  assert.equal(result.atpL1.signatureVerified, false);
+  assert.equal(result.passed, false);
 });
 
 test("cli run command returns ATP report", async () => {

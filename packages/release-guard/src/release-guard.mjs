@@ -3,6 +3,7 @@ import { createHash, randomInt } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { generateSigningKeyPair, signReceipt } from "@atp/spec";
 
 function stableStringify(value) {
   if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
@@ -274,6 +275,19 @@ export async function runPublishCommand(argv = process.argv.slice(2)) {
   if (String(intent?.context?.expected_manifest_sha256 ?? "") !== String(checkReport?.release?.manifest_sha256 ?? "")) {
     throw new Error("publish blocked: intent manifest digest does not match check report");
   }
+  const publishPackData = await collectPackData(packageDir);
+  if (String(checkReport?.package?.name ?? "") !== publishPackData.packageName) {
+    throw new Error("publish blocked: package name changed since check report (stale evidence)");
+  }
+  if (String(checkReport?.package?.version ?? "") !== publishPackData.packageVersion) {
+    throw new Error("publish blocked: package version changed since check report (stale evidence)");
+  }
+  if (String(checkReport?.release?.tarball_sha256 ?? "") !== publishPackData.tarballSha256) {
+    throw new Error("publish blocked: tarball digest changed since check report (stale evidence)");
+  }
+  if (String(checkReport?.release?.manifest_sha256 ?? "") !== publishPackData.manifestSha256) {
+    throw new Error("publish blocked: manifest digest changed since check report (stale evidence)");
+  }
 
   if (outcome === "deny") {
     throw new Error("publish blocked by deny decision");
@@ -295,9 +309,9 @@ export async function runPublishCommand(argv = process.argv.slice(2)) {
   const occurredAt = nowIso();
   const snapshot = {
     release: {
-      tarball_sha256: checkReport?.release?.tarball_sha256,
-      manifest_sha256: checkReport?.release?.manifest_sha256,
-      manifest_paths: checkReport?.release?.manifest_paths ?? [],
+      tarball_sha256: publishPackData.tarballSha256,
+      manifest_sha256: publishPackData.manifestSha256,
+      manifest_paths: publishPackData.manifestPaths,
       publish_attempted: publishExecuted
     },
     policy: {
@@ -314,7 +328,6 @@ export async function runPublishCommand(argv = process.argv.slice(2)) {
     decision_id: decision.decision_id,
     execution_status: publishExecuted ? "executed" : "blocked",
     captured_at: occurredAt,
-    signature: `sha256:${snapshotHash}`,
     occurred_at: occurredAt,
     received_at: occurredAt,
     sealed_at: occurredAt,
@@ -324,6 +337,8 @@ export async function runPublishCommand(argv = process.argv.slice(2)) {
     intent,
     decision
   };
+  const keyPair = generateSigningKeyPair();
+  const signedReceipt = signReceipt(receipt, keyPair.privateKey, `release-guard-${id}`);
 
   const result = {
     generatedAt: occurredAt,
@@ -332,7 +347,7 @@ export async function runPublishCommand(argv = process.argv.slice(2)) {
     executed: publishExecuted,
     intent,
     decision,
-    receipt
+    receipt: signedReceipt
   };
   await writeOutput(outputPath, result);
   return result;

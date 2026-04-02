@@ -14,8 +14,11 @@ export function evaluateRuntimeConformance(runtime) {
   const publicKey = typeof attestation?.trustReceiptPublicKey === "string"
     ? attestation.trustReceiptPublicKey
     : "";
+  const expectedKid = typeof attestation?.trustReceiptKeyId === "string" && attestation.trustReceiptKeyId.trim().length > 0
+    ? attestation.trustReceiptKeyId
+    : undefined;
   const signatureVerification = publicKey && typeof receipt?.signature === "object"
-    ? verifyReceiptSignature(receipt, publicKey)
+    ? verifyReceiptSignature(receipt, publicKey, { expectedKid })
     : { ok: false, reason: "receipt_signature_verification_failed", detail: "missing Ed25519 signature or public key" };
   const keyDistributionOk = Boolean(
     attestation?.keyDistribution?.published === true &&

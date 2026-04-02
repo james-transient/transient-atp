@@ -49,6 +49,25 @@ test("signing: verification fails after tampering", () => {
   assert.equal(result.ok, false);
 });
 
+test("signing: verification fails when canonicalization metadata is invalid", () => {
+  const { publicKey, privateKey } = generateSigningKeyPair();
+  const receipt = { receipt_id: "TR-1", intent_id: "TI-1", decision_id: "TD-1" };
+  const signed = signReceipt(receipt, privateKey, "test-key");
+  signed.signature.canonicalization = "NOT-ATP";
+  const result = verifyReceiptSignature(signed, publicKey);
+  assert.equal(result.ok, false);
+  assert.match(String(result.detail ?? ""), /canonicalization/i);
+});
+
+test("signing: verification fails when expected kid does not match", () => {
+  const { publicKey, privateKey } = generateSigningKeyPair();
+  const receipt = { receipt_id: "TR-1", intent_id: "TI-1", decision_id: "TD-1" };
+  const signed = signReceipt(receipt, privateKey, "kid-original");
+  const result = verifyReceiptSignature(signed, publicKey, { expectedKid: "kid-other" });
+  assert.equal(result.ok, false);
+  assert.match(String(result.detail ?? ""), /kid mismatch/i);
+});
+
 test("signing: receiptFingerprint is deterministic", () => {
   const receipt = { receipt_id: "TR-1", intent_id: "TI-1", decision_id: "TD-1" };
   const fp1 = receiptFingerprint(receipt);
@@ -84,6 +103,13 @@ test("replay guard: rejects receipt outside observation window", () => {
   const result = guard.check(receipt);
   assert.equal(result.ok, false);
   assert.equal(result.reason, "receipt_outside_window");
+});
+
+test("replay guard: rejects invalid sealed_at format", () => {
+  const guard = new ReplayGuard({ windowMs: 60000, skewMs: 5000 });
+  const result = guard.check({ receipt_id: "TR-789", sealed_at: "not-a-date" });
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "receipt_invalid_datetime_format");
 });
 
 test("schema files are loadable json", async () => {
