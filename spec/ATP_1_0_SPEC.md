@@ -115,8 +115,8 @@ Implementations SHOULD use `input_hash` and `output_hash` fields (SHA-256 digest
  
  The root ATP receipt, as well as the `intent` and `decision` sub-objects, MAY include a `metadata` dictionary to contain vendor-specific, runtime-specific, or domain-specific data (for example: internal trace IDs, deployment environments, debugging flags, LLM token counts, or arbitrary developer graffiti keys).
  
- - `metadata` (object, OPTIONAL): MUST only contain values that are predictably serialized by the cryptographic canonicalization scheme.
- - Verifiers MUST NOT reject receipts solely due to the presence of unrecognized key-value pairs within the `metadata` namespaces.
+- `metadata` (object, OPTIONAL): MUST only contain values that are predictably serialized by the cryptographic canonicalization scheme. To prevent resource-exhaustion attacks against JSON parsers and canonicalization engines, the `metadata` object SHALL NOT contain more than 20 properties, and any string value SHOULD NOT exceed 1024 characters.
+- Verifiers MUST NOT reject receipts solely due to the presence of unrecognized key-value pairs within the `metadata` namespaces, but MAY reject receipts with payloads exceeding parsing limits.
  - Because `metadata` is included in the ATP Canonicalization payload, mutating these fields *after* signing will invalidate the signature.
  
  ## Cost and Attribution
