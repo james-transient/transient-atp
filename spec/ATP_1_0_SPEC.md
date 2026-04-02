@@ -111,14 +111,22 @@ The `allow`/`approve`/`deny` model is informed by inline Policy Enforcement Poin
 
 Implementations SHOULD use `input_hash` and `output_hash` fields (SHA-256 digest of canonicalized payload) instead of embedding raw sensitive payloads in the receipt. Raw payloads SHOULD NOT be included unless policy explicitly requires retention.
 
-## Cost and Attribution
-
-Implementations MAY include a `cost` object with:
-
-- `amount` (string, REQUIRED): decimal string representation.
-- `currency` (string, REQUIRED): ISO 4217 code or protocol-specific token symbol.
-- `unit` (string, OPTIONAL): e.g. `request`, `token`, `execution`.
-- `payer` (string, OPTIONAL): actor attributed the cost of the action.
+## Metadata Extensions
+ 
+ The root ATP receipt, as well as the `intent` and `decision` sub-objects, MAY include a `metadata` dictionary to contain vendor-specific, runtime-specific, or domain-specific data (for example: internal trace IDs, deployment environments, debugging flags, LLM token counts, or arbitrary developer graffiti keys).
+ 
+ - `metadata` (object, OPTIONAL): MUST only contain values that are predictably serialized by the cryptographic canonicalization scheme.
+ - Verifiers MUST NOT reject receipts solely due to the presence of unrecognized key-value pairs within the `metadata` namespaces.
+ - Because `metadata` is included in the ATP Canonicalization payload, mutating these fields *after* signing will invalidate the signature.
+ 
+ ## Cost and Attribution
+ 
+ Implementations MAY include a `cost` object with:
+ 
+ - `amount` (string, REQUIRED): decimal string representation.
+ - `currency` (string, REQUIRED): ISO 4217 code or protocol-specific token symbol (e.g. `USD`, `FLW`).
+ - `unit` (string, OPTIONAL): e.g. `request`, `token`, `execution`.
+ - `payer` (string, OPTIONAL): actor attributed the cost of the action.
 
 ## Transport
 
