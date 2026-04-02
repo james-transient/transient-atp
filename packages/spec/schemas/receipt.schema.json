@@ -54,7 +54,7 @@
             "version": { "type": "string" },
             "kid": { "type": "string", "minLength": 1 },
             "sig": { "type": "string", "minLength": 1 },
-            "canonicalization": { "const": "ATP-JCS-SORTED-UTF8" }
+            "canonicalization": { "const": "RFC8785-JCS" }
           },
           "additionalProperties": true
         },

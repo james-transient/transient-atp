@@ -1,4 +1,5 @@
 import { sign as cryptoSign, verify as cryptoVerify, generateKeyPairSync, createHash, createPublicKey } from "node:crypto";
+import canonicalize from "canonicalize";
 
 export const ATP_SIGNING_ALGORITHM = "Ed25519";
 export const ATP_SIGNING_VERSION = "ATP-ED25519-1";
@@ -10,18 +11,10 @@ export function generateSigningKeyPair() {
   });
 }
 
-function sortedStringify(obj) {
-  if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
-    return JSON.stringify(obj);
-  }
-  const sorted = Object.fromEntries(Object.keys(obj).sort().map((key) => [key, obj[key]]));
-  return `{${Object.entries(sorted).map(([k, v]) => `${JSON.stringify(k)}:${sortedStringify(v)}`).join(",")}}`;
-}
-
 export function canonicalJSONString(receipt) {
   const clone = structuredClone(receipt);
   delete clone.signature;
-  return sortedStringify(clone);
+  return canonicalize(clone);
 }
 
 export function canonicalBytes(receipt) {
@@ -39,7 +32,7 @@ export function signReceipt(receipt, privateKeyPem, keyId) {
       version: ATP_SIGNING_VERSION,
       kid: keyId,
       sig,
-      canonicalization: "ATP-JCS-SORTED-UTF8"
+      canonicalization: "RFC8785-JCS"
     }
   };
 }
@@ -52,11 +45,11 @@ export function verifyReceiptSignature(receipt, publicKeyPem, options = {}) {
   if (sig.alg !== ATP_SIGNING_ALGORITHM) {
     return { ok: false, reason: "receipt_invalid_signature", detail: `unsupported algorithm '${sig.alg}'` };
   }
-  if (sig.canonicalization !== "ATP-JCS-SORTED-UTF8") {
+  if (sig.canonicalization !== "RFC8785-JCS") {
     return {
       ok: false,
       reason: "receipt_invalid_signature",
-      detail: "canonicalization must be ATP-JCS-SORTED-UTF8"
+      detail: "canonicalization must be RFC8785-JCS"
     };
   }
   if (typeof sig.kid !== "string" || sig.kid.trim().length === 0) {

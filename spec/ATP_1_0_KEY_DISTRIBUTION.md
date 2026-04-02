@@ -107,7 +107,7 @@ The `/.well-known/atp-config` capability document (defined in `ATP_1_0_TRANSPORT
   "atp": {
     "version": "1.0",
     "signing": ["Ed25519"],
-    "canonicalization": "ATP-JCS-SORTED-UTF8",
+    "canonicalization": "RFC8785-JCS",
     "transport": ["X-ATP-Receipt", "body.receipt"],
     "keys_endpoint": "/.well-known/atp-keys"
   }

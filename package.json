@@ -20,5 +20,8 @@
     "test:spec": "npm run -w @atp/spec test",
     "test:cli": "npm run -w @atp/conformance-cli test",
     "test:release-guard": "npm run -w @atp/release-guard test"
+  },
+  "dependencies": {
+    "canonicalize": "^2.1.0"
   }
 }
