@@ -6,6 +6,7 @@ import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { createSampleReceipt, validateReceiptATP } from "../src/lib/receipt.mjs";
 import { validateConformanceReport } from "../src/lib/contract-validate.mjs";
+import { evaluateRuntimeConformance } from "../src/lib/conformance.mjs";
 import {
   evaluateReleaseGovernanceEvidence,
   validateReleaseGovernanceReport
@@ -89,6 +90,69 @@ test("legacy sha256 signature produces deprecation warning, not error", () => {
   assert.equal(result.issues.length, 0);
   assert.ok(result.warnings.length > 0);
   assert.equal(result.warnings[0].code, "receipt_deprecated_legacy_signature");
+});
+
+test("runtime conformance fails forged legacy signature even when trustReceiptSigned is true", () => {
+  const receipt = createSampleReceipt({
+    runId: "forged-legacy",
+    sessionId: "forged-legacy",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  receipt.signature = `sha256:${"0".repeat(64)}`;
+  const result = evaluateRuntimeConformance({
+    runtimeId: "forged-runtime",
+    requiredLevel: "CLASSIFY_ONLY",
+    requiredAtpL1: true,
+    evidence: {
+      attestation: {
+        trustReceiptSigned: true,
+        keyDistribution: { published: true, endpoint: "/.well-known/atp-keys" },
+        replayProtection: { enabled: true, observationWindowSeconds: 300 },
+        trustReceipt: receipt
+      }
+    }
+  });
+  assert.equal(result.atpL1.valid, true);
+  assert.equal(result.atpL1.signatureVerified, false);
+  assert.equal(result.passed, false);
+});
+
+test("runtime conformance requires cryptographic verification for PASS", () => {
+  const { privateKey, publicKey } = generateSigningKeyPair();
+  const receipt = createSampleReceipt({
+    runId: "runtime-verify-pass",
+    sessionId: "runtime-verify-pass",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(receipt, privateKey, "runtime-key-001");
+  const result = evaluateRuntimeConformance({
+    runtimeId: "verified-runtime",
+    requiredLevel: "CLASSIFY_ONLY",
+    requiredAtpL1: true,
+    evidence: {
+      attestation: {
+        trustReceiptSigned: true,
+        trustReceiptPublicKey: publicKey,
+        keyDistribution: { published: true, endpoint: "/.well-known/atp-keys" },
+        replayProtection: { enabled: true, observationWindowSeconds: 300 },
+        trustReceipt: signed
+      }
+    }
+  });
+  assert.equal(result.atpL1.signatureVerified, true);
+  assert.equal(result.passed, true);
 });
 
 test("cli run command returns ATP report", async () => {
@@ -281,6 +345,10 @@ test("contract validator rejects malformed requiredRuntimes typing", () => {
       decisionOutcomes: ["allow", "approve", "deny"],
       executionStatuses: ["executed", "blocked", "expired", "error"],
       complete: true
+    },
+    requiredControlChecks: {
+      keyDistribution: true,
+      replayProtection: true
     },
     requiredRuntimes: [
       {

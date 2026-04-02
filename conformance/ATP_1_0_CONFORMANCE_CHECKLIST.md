@@ -93,7 +93,6 @@ The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, RECOMMENDED, 
 - `ATP-L1-RGP-003`: Lifecycle stage order MUST be `preflight declaration` -> `policy evaluation` -> `execution authorization` -> `post-execution attestation`.
 - `ATP-L1-RGP-004`: Where policy requires explicit approval, an `approval gate` stage MUST be represented between policy evaluation and execution authorization.
 - `ATP-L1-RGP-005`: Where policy requires explicit approval, `decision.outcome` MUST be `approve` before execution is authorized.
-- `ATP-L1-RGP-004`: `intent.context` MUST include `package_name`, `package_version`, `expected_tarball_sha256`, and `expected_manifest_sha256` for `registry.publish`.
 - `ATP-L1-RGP-006`: `intent.context` MUST include `package_name`, `package_version`, `expected_tarball_sha256`, and `expected_manifest_sha256` for `registry.publish`.
 - `ATP-L1-RGP-007`: Release profile receipts MUST satisfy ATP-L1 receipt invariants.
 - `ATP-L1-RGP-008`: Digest binding MUST hold between intent and receipt evidence (`expected_tarball_sha256 == release.tarball_sha256` and `expected_manifest_sha256 == release.manifest_sha256`).

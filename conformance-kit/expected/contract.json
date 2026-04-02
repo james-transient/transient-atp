@@ -5,6 +5,10 @@
     "executionStatuses": ["executed", "blocked", "expired", "error"],
     "complete": true
   },
+  "requiredControlChecks": {
+    "keyDistribution": true,
+    "replayProtection": true
+  },
   "requiredRuntimes": [
     {
       "runtimeId": "financial-flowers-allow-under-budget",

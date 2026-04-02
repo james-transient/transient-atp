@@ -7,6 +7,9 @@ function validateContractShape(contract, failures) {
   const hasDecisionOutcomes = Array.isArray(contract?.requiredScenarioCoverage?.decisionOutcomes);
   const hasExecutionStatuses = Array.isArray(contract?.requiredScenarioCoverage?.executionStatuses);
   const hasCompleteFlag = typeof contract?.requiredScenarioCoverage?.complete === "boolean";
+  const hasControlChecks = contract && typeof contract.requiredControlChecks === "object";
+  const hasKeyDistributionControl = typeof contract?.requiredControlChecks?.keyDistribution === "boolean";
+  const hasReplayProtectionControl = typeof contract?.requiredControlChecks?.replayProtection === "boolean";
   const hasRequiredRuntimes = Array.isArray(contract?.requiredRuntimes);
 
   assertCondition(typeof contract?.requiredOverall === "string", "contract.requiredOverall must be a string", failures);
@@ -14,6 +17,9 @@ function validateContractShape(contract, failures) {
   assertCondition(hasDecisionOutcomes, "contract.requiredScenarioCoverage.decisionOutcomes must be an array", failures);
   assertCondition(hasExecutionStatuses, "contract.requiredScenarioCoverage.executionStatuses must be an array", failures);
   assertCondition(hasCompleteFlag, "contract.requiredScenarioCoverage.complete must be a boolean", failures);
+  assertCondition(hasControlChecks, "contract.requiredControlChecks must be an object", failures);
+  assertCondition(hasKeyDistributionControl, "contract.requiredControlChecks.keyDistribution must be a boolean", failures);
+  assertCondition(hasReplayProtectionControl, "contract.requiredControlChecks.replayProtection must be a boolean", failures);
   assertCondition(hasRequiredRuntimes, "contract.requiredRuntimes must be an array", failures);
 
   if (hasDecisionOutcomes) {
@@ -68,6 +74,20 @@ export function validateConformanceReport(report, contract) {
   }
   if (contract.requiredScenarioCoverage.complete === true) {
     assertCondition(report?.scenarioCoverage?.complete === true, "scenario coverage expected complete=true", failures);
+  }
+  if (typeof contract?.requiredControlChecks?.keyDistribution === "boolean") {
+    assertCondition(
+      Boolean(report?.controlChecks?.keyDistribution) === contract.requiredControlChecks.keyDistribution,
+      `control check keyDistribution expected ${contract.requiredControlChecks.keyDistribution}`,
+      failures
+    );
+  }
+  if (typeof contract?.requiredControlChecks?.replayProtection === "boolean") {
+    assertCondition(
+      Boolean(report?.controlChecks?.replayProtection) === contract.requiredControlChecks.replayProtection,
+      `control check replayProtection expected ${contract.requiredControlChecks.replayProtection}`,
+      failures
+    );
   }
 
   const requiredRuntimes = contract.requiredRuntimes;

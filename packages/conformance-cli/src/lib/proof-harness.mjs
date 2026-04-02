@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import { createSampleReceipt } from "./receipt.mjs";
 import { runConformanceProofHarness } from "./conformance.mjs";
+import { generateSigningKeyPair, signReceipt } from "@atp/spec";
 
 function sampleRuntimes(frames) {
   const baseEvents = frames
@@ -11,25 +12,39 @@ function sampleRuntimes(frames) {
       capturedAt: new Date(Date.UTC(2026, 2, 31, 0, 0, idx)).toISOString()
     }));
 
-  const withStatus = (runId, sessionId, runStatus, haltReason, action) => ({
-    runtimeId: runId,
-    requiredLevel: "CLASSIFY_ONLY",
-    requiredAtpL1: true,
-    evidence: {
+  const withStatus = (runId, sessionId, runStatus, haltReason, action) => {
+    const keyPair = generateSigningKeyPair();
+    const baseReceipt = createSampleReceipt({
+      runId,
+      sessionId,
+      runStatus,
+      haltReason,
       events: baseEvents,
-      attestation: {
-        trustReceiptSigned: true,
-        trustReceipt: createSampleReceipt({
-          runId,
-          sessionId,
-          runStatus,
-          haltReason,
-          events: baseEvents,
-          action
-        })
+      action
+    });
+    const signedReceipt = signReceipt(baseReceipt, keyPair.privateKey, `harness-${runId}`);
+    return {
+      runtimeId: runId,
+      requiredLevel: "CLASSIFY_ONLY",
+      requiredAtpL1: true,
+      evidence: {
+        events: baseEvents,
+        attestation: {
+          trustReceiptSigned: true,
+          trustReceiptPublicKey: keyPair.publicKey,
+          keyDistribution: {
+            published: true,
+            endpoint: "/.well-known/atp-keys"
+          },
+          replayProtection: {
+            enabled: true,
+            observationWindowSeconds: 300
+          },
+          trustReceipt: signedReceipt
+        },
       }
-    }
-  });
+    };
+  };
 
   return [
     withStatus("financial-flowers-allow-under-budget", "sess-a", "success", "none", "purchase_flowers"),

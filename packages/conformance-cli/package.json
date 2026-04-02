@@ -1,6 +1,6 @@
 {
   "name": "@atp/conformance-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ATP conformance runner and validator CLI.",
   "license": "Apache-2.0",
   "author": "James Everest <james@transientintelligence.com> (https://transientintelligence.com)",
