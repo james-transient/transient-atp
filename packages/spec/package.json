@@ -17,5 +17,8 @@
   ],
   "scripts": {
     "test": "node --test ./test/smoke.test.mjs"
+  },
+  "dependencies": {
+    "canonicalize": "^2.1.0"
   }
 }

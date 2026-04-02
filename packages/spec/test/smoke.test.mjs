@@ -130,17 +130,17 @@ test("receipt schema locks schemaVersion and canonicalization constants", async 
   const receiptSchema = JSON.parse(receiptSchemaRaw);
   assert.equal(receiptSchema.properties.schemaVersion.const, "1.0.0");
   const objectSignature = receiptSchema.properties.signature.oneOf.find((entry) => entry.type === "object");
-  assert.equal(objectSignature.properties.canonicalization.const, "ATP-JCS-SORTED-UTF8");
+  assert.equal(objectSignature.properties.canonicalization.const, "RFC8785-JCS");
 });
 
 test("canonicalization/signature vector matches expected payload and signature", async () => {
-  const vectorPath = resolve(process.cwd(), "..", "..", "spec", "test-vectors", "canonicalization-signature.v1.json");
+  const vectorPath = resolve(process.cwd(), "..", "..", "spec", "test-vectors", "canonicalization-signature.v2.json");
   const vector = JSON.parse(await readFile(vectorPath, "utf8"));
   const canonicalPayload = canonicalJSONString(vector.receipt);
   const canonicalPayloadSha256 = createHash("sha256").update(canonicalBytes(vector.receipt)).digest("hex");
   assert.equal(canonicalPayload, vector.canonicalPayload);
   assert.equal(canonicalPayloadSha256, vector.canonicalPayloadSha256);
-  assert.equal(vector.signedReceipt.signature.canonicalization, "ATP-JCS-SORTED-UTF8");
+  assert.equal(vector.signedReceipt.signature.canonicalization, "RFC8785-JCS");
   assert.equal(vector.signedReceipt.signature.kid, vector.kid);
   const verification = verifyReceiptSignature(vector.signedReceipt, vector.publicKey, { expectedKid: vector.kid });
   assert.equal(verification.ok, true);

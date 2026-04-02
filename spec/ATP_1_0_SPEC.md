@@ -55,25 +55,22 @@ ATP is a protocol for governing and verifying autonomous agent actions against a
 
 ATP 1.0 ATP-L1 conformance MUST use Ed25519 with canonical JSON serialization for receipt signing.
 
-ATP's signing model draws on established patterns in the agent attestation space, including Ed25519 and canonical JSON serialization as used by W3C Verifiable Credentials, JSON Web Signatures (RFC 7515), and similar protocols. The `ATP-JCS-SORTED-UTF8` canonicalization is ATP's own scheme, chosen for simplicity of independent implementation.
+ATP's signing model draws on established patterns in the agent attestation space, including Ed25519 and canonical JSON serialization as used by W3C Verifiable Credentials, JSON Web Signatures (RFC 7515), and similar protocols. The baseline canonicalization scheme MUST be `RFC8785-JCS`. Implementations parsing historical versions of ATP (pre-1.1.0) MAY support the deprecated `ATP-JCS-SORTED-UTF8` scheme, but MUST NOT issue new signatures using it.
 
 ### Canonicalization
-
-Canonicalization algorithm identifier: `ATP-JCS-SORTED-UTF8`.
-
-The signing payload MUST be constructed as follows:
-
-1. Clone the full receipt object.
-2. Remove the `signature` field from the clone.
-3. Recursively sort all object keys lexicographically.
-4. Preserve array element order exactly as provided.
-5. Serialize primitive values using ECMAScript JSON semantics (`JSON.stringify`) with no insignificant whitespace.
-6. Do not apply Unicode normalization; strings are serialized as provided.
-7. Encode as UTF-8 bytes.
+ 
+ Canonicalization algorithm identifier: `RFC8785-JCS`.
+ 
+ The signing payload MUST be constructed as follows:
+ 
+ 1. Clone the full receipt object.
+ 2. Remove the `signature` field from the clone.
+ 3. Serialize the resulting object according to [RFC 8785 (JSON Canonicalization Scheme - JCS)](https://www.rfc-editor.org/rfc/rfc8785.html).
+ 4. Encode as UTF-8 bytes.
 
 Normative canonicalization and signature test vectors are published in:
 
-- `spec/test-vectors/canonicalization-signature.v1.json`
+- `spec/test-vectors/canonicalization-signature.v2.json`
 
 ### Signature Object
 
@@ -82,7 +79,7 @@ When Ed25519 signing is used, `signature` MUST be an object with:
 - `alg` (string, REQUIRED): MUST be `Ed25519`.
 - `kid` (string, REQUIRED): key identifier for the signing key.
 - `sig` (string, REQUIRED): base64url-encoded Ed25519 signature over canonical payload bytes.
-- `canonicalization` (string, REQUIRED): MUST be `ATP-JCS-SORTED-UTF8`.
+- `canonicalization` (string, REQUIRED): MUST be `RFC8785-JCS`.
 - `version` (string, OPTIONAL): signing version identifier.
 
 Implementations MAY parse legacy hash-only signatures in format `sha256:<64-hex>` to support migration workflows, but this form is not sufficient for ATP-L1 conformance. The `sha256:` string form is deprecated as of ATP 1.0 and MUST NOT be accepted in ATP 2.0. Validators MUST surface a deprecation warning when this form is presented.
@@ -146,7 +143,7 @@ Services advertising ATP support SHOULD expose `/.well-known/atp-config` with a 
   "atp": {
     "version": "1.0",
     "signing": ["Ed25519"],
-    "canonicalization": "ATP-JCS-SORTED-UTF8",
+    "canonicalization": "RFC8785-JCS",
     "transport": ["X-ATP-Receipt", "body.receipt"],
     "keys_endpoint": "/.well-known/atp-keys"
   }

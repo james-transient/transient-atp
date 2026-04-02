@@ -7,7 +7,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAyRnqajbEzi0FUtklWcyLGJ1JmUiIEKaDQPu6uc9xcbM=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAX2vQxDA3yfpdPi1mpWnd6uLjC0byAnxPdkEjs0U2d3s=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-001",
           "keyDistribution": {
             "published": true,
@@ -28,8 +28,8 @@
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-001",
-              "sig": "Zl6S5rIOg_xN8bX7WbOpXFpoYk2YySV5bXCJFVW4h18cSn_Yz--7s6qj2DEjwaj0cj_e8cVUMXL4FnVXwOoQDQ",
-              "canonicalization": "ATP-JCS-SORTED-UTF8"
+              "sig": "KR3CYrqbu29bpMzpHl4cbIiHaQCP8fmzo-KckjH10iVdp4mbWwOF3n45Ix-XogN5R7dkfq5pPaiV90ocwPeHDA",
+              "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
             "received_at": "2026-03-31T00:00:00.000Z",
@@ -54,7 +54,7 @@
                 }
               ]
             },
-            "event_snapshot_hash": "e12d8fe9e3c455893e6f6b34e81b18b05ff6fdd664bd449c6d05bdb12c21cc3d",
+            "event_snapshot_hash": "92566753b5878bed2388c05693d23836ed404126349d7dca3249fff37c740081",
             "correlation_id": "financial-flowers-allow-under-budget:sess-a:0",
             "intent": {
               "intent_id": "TI-10836445060113977766",
@@ -87,7 +87,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAaVoVFHikaCZR6FmYTh06aThCUsXnw6Oq6ls9LaTEnRU=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAcTU7+1igE+ojzctx9bKrkSwq73rbi9dMM3VzZTanp/0=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-002",
           "keyDistribution": {
             "published": true,
@@ -108,8 +108,8 @@
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-002",
-              "sig": "JOH9CQfK1PDBkZ739hgRoUXioONgO3aR78Rmfh3OTdDL3zWUCp8Qkssb60ktHm-w_51CAkEn8wvLACnyjL4eCw",
-              "canonicalization": "ATP-JCS-SORTED-UTF8"
+              "sig": "Q5I2G3CyMx60jRtWezI5teCWroajEzX66Q6z6gIH7mkjVWPN6H5lxQx0_g_Aw-BXHNctOPn6aLUAK0Ni9zb_Dg",
+              "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
             "received_at": "2026-03-31T00:00:00.000Z",
@@ -134,7 +134,7 @@
                 }
               ]
             },
-            "event_snapshot_hash": "ce385cc416badfef57c43d68492781f658d63fb3adabcd0f18ec13d36d971aee",
+            "event_snapshot_hash": "6631d0d5e4466589a35b0c2e1c8ac7812fd568e08601e57bcaef410f61d8c05a",
             "correlation_id": "financial-flowers-approve-over-budget:sess-b:0",
             "intent": {
               "intent_id": "TI-12695406145235022926",
@@ -167,7 +167,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAkQh5Yz9yl96L6nCo9aIYGu4prd4ToCX9MdM8XoJAPT8=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAWSal3pPEF35rkrg1EnDLG1av7/UVs0GgoufOcvtdviA=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-003",
           "keyDistribution": {
             "published": true,
@@ -188,8 +188,8 @@
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-003",
-              "sig": "bJzaO871I-T_-OiyQrVtvayewLvPojAYxKHgUp-ZwjTLjjiiPUPfwID7uuVYSf0e2SKHXMRd9EblOw0uqeMKDg",
-              "canonicalization": "ATP-JCS-SORTED-UTF8"
+              "sig": "W5P8GYz4yLjNdaKpG95KfqTSG4ymw40CJoU5soN4aaXNO14NabHMt8K_LaNOGZ6ddVm1U9QPm1zSV3znwBNyDQ",
+              "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
             "received_at": "2026-03-31T00:00:00.000Z",
@@ -214,7 +214,7 @@
                 }
               ]
             },
-            "event_snapshot_hash": "ac20261050ae6de09a23cd0c976f471138a5aa04be2a1ac80eaa98265fae3b36",
+            "event_snapshot_hash": "3ada5fcf320c78eb0acd059bbec04228b5163e2fb08eb7cb104efcc1b921e9ca",
             "correlation_id": "financial-flowers-deny-blocked-merchant:sess-c:0",
             "intent": {
               "intent_id": "TI-4571501680426654385",
@@ -247,7 +247,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAmUj/me2wXnY2cBRBekhbkVdZl5kQb40Spm5ZSxABtWo=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAVm7dGy4jPM+Duxielwnzjuql2Pt851Iyvzp6sJZ2Ppg=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-004",
           "keyDistribution": {
             "published": true,
@@ -268,8 +268,8 @@
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-004",
-              "sig": "KsabUCFyDPdBc4qTbXv6XBu6C6wIOnNPGyERaPROTHpTDyqNpryNO_iaBzgfMUfdtniBO8svZJGf6euZWp_GCQ",
-              "canonicalization": "ATP-JCS-SORTED-UTF8"
+              "sig": "W89g93-vGaPvbaiFhiU1NJ6L1qgKFKaGDeeD67TrSuH-l2-orUqpJuirVwW_J0kSWhxUdu9Ie0a9jA8A6L7lCQ",
+              "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
             "received_at": "2026-03-31T00:00:00.000Z",
@@ -294,7 +294,7 @@
                 }
               ]
             },
-            "event_snapshot_hash": "40b082dfb7878be38a7c964df4e3fed9be091f8d3476a21351a7a4aef42ac07f",
+            "event_snapshot_hash": "cb994a34cb1631a874fad0cf5da52f7b381e0e28451777f42b0c883cb16e5f1c",
             "correlation_id": "scenario-expired-approval-window:sess-d:0",
             "intent": {
               "intent_id": "TI-1391482379520540908",
@@ -327,7 +327,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAZiivz6ztyzfZegStqjn4ot0/gp8mHYoAxLXNEFXleBo=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA5zJMD62OvxoMD2J8eynDcaWITrqglu/TBiKH/NFgsKA=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-005",
           "keyDistribution": {
             "published": true,
@@ -348,8 +348,8 @@
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-005",
-              "sig": "0zSEDQBgg82YTlXuJD1jROuuwCgLJhhautGad51Ffq8I66eE1C5MeJLEUle0taSznHtrRZHfqKTdtYE_J4sKDw",
-              "canonicalization": "ATP-JCS-SORTED-UTF8"
+              "sig": "Yz4rsT0qSDjJ8HnH9H4qfftuP_4Hx_bpbJFZMiqsQFTxH4GInuCnAFW3MDBr_C0ff8_4iKOS1VbvG40fZ_JgDg",
+              "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
             "received_at": "2026-03-31T00:00:00.000Z",
@@ -374,7 +374,7 @@
                 }
               ]
             },
-            "event_snapshot_hash": "029a75d81d3b614056d253d5779655a5baca524a936ed647f521e181c6ff4e5f",
+            "event_snapshot_hash": "590eb9fce080838d8a4e3d4eac4cfb504ccbc93f2067a00bd41e858fa5e87514",
             "correlation_id": "scenario-error-runtime-failure:sess-e:0",
             "intent": {
               "intent_id": "TI-2600524594693414184",

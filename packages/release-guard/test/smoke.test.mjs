@@ -190,7 +190,7 @@ test("publish command emits receipt bound to check digests", async () => {
   assert.equal(result.receipt.receipt_id, "TR-123");
   assert.equal(typeof result.receipt.signature, "object");
   assert.equal(result.receipt.signature.alg, "Ed25519");
-  assert.equal(result.receipt.signature.canonicalization, "ATP-JCS-SORTED-UTF8");
+  assert.equal(result.receipt.signature.canonicalization, "RFC8785-JCS");
   assert.equal(result.receipt.event_snapshot.release.tarball_sha256, check.release.tarball_sha256);
   assert.equal(result.receipt.event_snapshot.release.manifest_sha256, check.release.manifest_sha256);
   const saved = JSON.parse(await readFile(outPath, "utf8"));
