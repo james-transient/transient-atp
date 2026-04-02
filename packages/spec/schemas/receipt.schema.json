@@ -24,6 +24,11 @@
     "schemaVersion": {
       "const": "1.0.0"
     },
+    "metadata": {
+      "type": "object",
+      "description": "OPTIONAL. Open namespace for implementation-specific, vendor, or domain-extensibility key-value pairs (e.g. trace_id, environment_name, token_counts).",
+      "additionalProperties": true
+    },
     "receipt_id": {
       "type": "string",
       "pattern": "^TR-\\d+$"
@@ -115,7 +120,7 @@
       "required": ["amount", "currency"],
       "properties": {
         "amount": { "type": "string", "description": "Decimal string to avoid floating-point ambiguity." },
-        "currency": { "type": "string", "description": "ISO 4217 code or protocol-specific token symbol." },
+        "currency": { "type": "string", "description": "ISO 4217 code or protocol-specific token symbol (e.g. USD, EUR, BTC, FLW)." },
         "unit": { "type": "string" },
         "payer": { "type": "string", "description": "Actor funding the action." }
       },

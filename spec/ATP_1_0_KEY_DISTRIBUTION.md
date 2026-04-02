@@ -48,6 +48,7 @@ GET /.well-known/atp-keys
 - `kid` MUST match the `kid` used in issued receipt signatures.
 - `use` SHOULD be `sig`.
 - `x` MUST be the base64url-encoded raw 32-byte Ed25519 public key.
+- `revoked_at` (string, OPTIONAL): RFC 3339 date-time string indicating when this key was compromised or retired. Verifiers MUST reject any receipt signed with this key if its `sealed_at` timestamp is greater than or equal to `revoked_at`.
 - The endpoint MUST return HTTP 200 with `Content-Type: application/json`.
 - The response MUST include all currently active keys.
 - The response SHOULD include recently retired keys for a minimum rotation window of 30 days.
@@ -59,9 +60,12 @@ When verifying a receipt, a verifier MUST:
 1. Extract `signature.kid` from the receipt.
 2. Fetch `/.well-known/atp-keys` from the issuing service.
 3. Locate the key entry matching `kid`.
-4. If no matching key is found, MUST reject the receipt with reason `receipt_key_not_found`.
-5. Reconstruct the Ed25519 public key from `x`.
-6. Verify the receipt signature per `ATP_1_0_SPEC.md § Signing`.
+4. If no matching key is found in the current or active rotation window, a verifier MAY assume it was removed and MUST reject the receipt (`receipt_key_not_found`).
+5. If the matching key contains a `revoked_at` property:
+   - Parse `received_at` or `sealed_at` from the receipt.
+   - If the receipt timestamp is strictly later than the `revoked_at` timestamp, the verifier MUST reject the receipt with reason `receipt_key_revoked`.
+6. Reconstruct the Ed25519 public key from `x`.
+7. Verify the receipt signature per `ATP_1_0_SPEC.md § Signing`.
 
 Verifiers SHOULD cache the JWKS response. Cache lifetime SHOULD NOT exceed 1 hour. Verifiers MUST re-fetch if a `kid` is not found in the cached set before failing permanently.
 
@@ -93,8 +97,9 @@ If signing key compromise is suspected, issuers MUST:
 
 1. Immediately stop signing with the compromised `kid`.
 2. Publish a replacement key with a new `kid`.
-3. Mark the compromised key as revoked in issuer-controlled metadata (for example, out-of-band incident bulletin or revocation endpoint).
-4. Reject receipt issuance with compromised keys from the revocation timestamp onward.
+3. Mark the compromised key as revoked in `/.well-known/atp-keys` by appending a `revoked_at` RFC 3339 timestamp.
+4. Keep the compromised and revoked key in the published endpoint for at least 30 days, or indefinitely.
+5. Reject new receipt issuance requests with compromised keys from the revocation timestamp onward.
 
 ATP 1.0 does not define a universal CRL/OCSP-equivalent transport. Implementations SHOULD document revocation signaling channels and retention policy for compromised keys.
 

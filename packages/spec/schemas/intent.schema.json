@@ -19,6 +19,11 @@
       "type": "string",
       "pattern": "^TI-\\d+$"
     },
+    "metadata": {
+      "type": "object",
+      "description": "OPTIONAL. Open namespace for implementation-specific intent key-value pairs.",
+      "additionalProperties": true
+    },
     "actor_id": {
       "type": "string",
       "minLength": 1
