@@ -22,6 +22,7 @@
     "metadata": {
       "type": "object",
       "description": "OPTIONAL. Open namespace for implementation-specific intent key-value pairs.",
+      "maxProperties": 20,
       "additionalProperties": true
     },
     "actor_id": {

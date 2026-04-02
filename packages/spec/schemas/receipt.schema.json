@@ -27,6 +27,7 @@
     "metadata": {
       "type": "object",
       "description": "OPTIONAL. Open namespace for implementation-specific, vendor, or domain-extensibility key-value pairs (e.g. trace_id, environment_name, token_counts).",
+      "maxProperties": 20,
       "additionalProperties": true
     },
     "receipt_id": {
