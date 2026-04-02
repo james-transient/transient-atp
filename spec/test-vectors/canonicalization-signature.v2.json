@@ -1,0 +1,135 @@
+{
+  "vectorVersion": "1.1.0",
+  "kid": "vector-key-002",
+  "canonicalization": "RFC8785-JCS",
+  "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA9G3oiEZbb5kPboy2sqFkFeeIcoNJnbGoMLWVu0Ee0wU=\n-----END PUBLIC KEY-----\n",
+  "receipt": {
+    "schemaVersion": "1.0.0",
+    "receipt_id": "TR-424242",
+    "intent_id": "TI-424242",
+    "decision_id": "TD-424242",
+    "execution_status": "executed",
+    "captured_at": "2026-03-31T00:00:02.123456Z",
+    "occurred_at": "2026-03-31T00:00:00.1Z",
+    "received_at": "2026-03-31T00:00:01.12Z",
+    "sealed_at": "2026-03-31T00:00:02.123456Z",
+    "event_snapshot": {
+      "events": [
+        {
+          "eventType": "tool_call_requested",
+          "capturedAt": "2026-03-31T00:00:00.1Z"
+        },
+        {
+          "eventType": "tool_call_executed",
+          "capturedAt": "2026-03-31T00:00:01.12Z"
+        },
+        {
+          "eventType": "run_end",
+          "capturedAt": "2026-03-31T00:00:02.123456Z"
+        }
+      ],
+      "haltReason": "none",
+      "runId": "vector-run",
+      "runStatus": "success",
+      "sessionId": "vector-session"
+    },
+    "event_snapshot_hash": "f226905af224a6dd0563e093e6f026e3ea455045a66fa03b984fa76d2a9ccc0e",
+    "correlation_id": "vector-run:vector-session:0",
+    "intent": {
+      "intent_id": "TI-424242",
+      "actor_id": "actor:vector",
+      "connector": "connector:vector",
+      "action": "registry.publish",
+      "action_class": "write_high",
+      "target": {
+        "registry": "npm"
+      },
+      "context": {
+        "meta": {
+          "priority": "high"
+        },
+        "package_name": "@atp/vector",
+        "package_version": "1.0.2",
+        "unicode": "café"
+      },
+      "governance_profile": "release_governance_profile",
+      "requested_at": "2026-03-31T00:00:00.1Z"
+    },
+    "decision": {
+      "decision_id": "TD-424242",
+      "intent_id": "TI-424242",
+      "outcome": "allow",
+      "reason_code": "policy_pass",
+      "decided_at": "2026-03-31T00:00:02.123456Z"
+    }
+  },
+  "canonicalPayload": "{\"captured_at\":\"2026-03-31T00:00:02.123456Z\",\"correlation_id\":\"vector-run:vector-session:0\",\"decision\":{\"decided_at\":\"2026-03-31T00:00:02.123456Z\",\"decision_id\":\"TD-424242\",\"intent_id\":\"TI-424242\",\"outcome\":\"allow\",\"reason_code\":\"policy_pass\"},\"decision_id\":\"TD-424242\",\"event_snapshot\":{\"events\":[{\"capturedAt\":\"2026-03-31T00:00:00.1Z\",\"eventType\":\"tool_call_requested\"},{\"capturedAt\":\"2026-03-31T00:00:01.12Z\",\"eventType\":\"tool_call_executed\"},{\"capturedAt\":\"2026-03-31T00:00:02.123456Z\",\"eventType\":\"run_end\"}],\"haltReason\":\"none\",\"runId\":\"vector-run\",\"runStatus\":\"success\",\"sessionId\":\"vector-session\"},\"event_snapshot_hash\":\"f226905af224a6dd0563e093e6f026e3ea455045a66fa03b984fa76d2a9ccc0e\",\"execution_status\":\"executed\",\"intent\":{\"action\":\"registry.publish\",\"action_class\":\"write_high\",\"actor_id\":\"actor:vector\",\"connector\":\"connector:vector\",\"context\":{\"meta\":{\"priority\":\"high\"},\"package_name\":\"@atp/vector\",\"package_version\":\"1.0.2\",\"unicode\":\"café\"},\"governance_profile\":\"release_governance_profile\",\"intent_id\":\"TI-424242\",\"requested_at\":\"2026-03-31T00:00:00.1Z\",\"target\":{\"registry\":\"npm\"}},\"intent_id\":\"TI-424242\",\"occurred_at\":\"2026-03-31T00:00:00.1Z\",\"receipt_id\":\"TR-424242\",\"received_at\":\"2026-03-31T00:00:01.12Z\",\"schemaVersion\":\"1.0.0\",\"sealed_at\":\"2026-03-31T00:00:02.123456Z\"}",
+  "canonicalPayloadSha256": "d214cfa94a6ac547dd4ee45b2d1ae5904a066ec7b292abab18169848b7d80ead",
+  "signedReceipt": {
+    "schemaVersion": "1.0.0",
+    "receipt_id": "TR-424242",
+    "intent_id": "TI-424242",
+    "decision_id": "TD-424242",
+    "execution_status": "executed",
+    "captured_at": "2026-03-31T00:00:02.123456Z",
+    "occurred_at": "2026-03-31T00:00:00.1Z",
+    "received_at": "2026-03-31T00:00:01.12Z",
+    "sealed_at": "2026-03-31T00:00:02.123456Z",
+    "event_snapshot": {
+      "events": [
+        {
+          "eventType": "tool_call_requested",
+          "capturedAt": "2026-03-31T00:00:00.1Z"
+        },
+        {
+          "eventType": "tool_call_executed",
+          "capturedAt": "2026-03-31T00:00:01.12Z"
+        },
+        {
+          "eventType": "run_end",
+          "capturedAt": "2026-03-31T00:00:02.123456Z"
+        }
+      ],
+      "haltReason": "none",
+      "runId": "vector-run",
+      "runStatus": "success",
+      "sessionId": "vector-session"
+    },
+    "event_snapshot_hash": "f226905af224a6dd0563e093e6f026e3ea455045a66fa03b984fa76d2a9ccc0e",
+    "correlation_id": "vector-run:vector-session:0",
+    "intent": {
+      "intent_id": "TI-424242",
+      "actor_id": "actor:vector",
+      "connector": "connector:vector",
+      "action": "registry.publish",
+      "action_class": "write_high",
+      "target": {
+        "registry": "npm"
+      },
+      "context": {
+        "meta": {
+          "priority": "high"
+        },
+        "package_name": "@atp/vector",
+        "package_version": "1.0.2",
+        "unicode": "café"
+      },
+      "governance_profile": "release_governance_profile",
+      "requested_at": "2026-03-31T00:00:00.1Z"
+    },
+    "decision": {
+      "decision_id": "TD-424242",
+      "intent_id": "TI-424242",
+      "outcome": "allow",
+      "reason_code": "policy_pass",
+      "decided_at": "2026-03-31T00:00:02.123456Z"
+    },
+    "signature": {
+      "alg": "Ed25519",
+      "version": "ATP-ED25519-1",
+      "kid": "vector-key-002",
+      "sig": "Cd04jRsm6XDoduTSZq1Xv6sn_wpkZALh_emocljKK4w_OQEVNDPdtzDIMy2FL7iII37DOKffAGSvJBDK1yM9AQ",
+      "canonicalization": "RFC8785-JCS"
+    }
+  }
+}
