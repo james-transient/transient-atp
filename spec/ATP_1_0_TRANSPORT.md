@@ -86,7 +86,7 @@ Receipt consumers MUST enforce uniqueness of `receipt_id` within a bounded obser
 - If a `receipt_id` is presented more than once within the observation window, the verifier MUST reject the duplicate with reason `receipt_replay_detected`.
 - The observation window MUST be at least as long as the maximum expected transit delay for receipts (RECOMMENDED: 5 minutes).
 - A receipt whose `sealed_at` timestamp falls outside the observation window MAY be rejected with reason `receipt_outside_window`.
-- A receipt with a missing or non-parseable `sealed_at` SHOULD be rejected by structural validation (see ATP-L1 receipt requirements) before reaching replay-detection logic. If the replay guard receives a receipt whose `sealed_at` cannot be parsed as a date-time, it MUST still enforce `receipt_id` uniqueness; the window check has no basis to apply and MUST be skipped rather than defaulting to rejection.
+- A receipt with a missing or non-parseable `sealed_at` MUST be rejected (`receipt_invalid_datetime_format`) before replay window checks are applied.
 - Verifiers MAY use any storage mechanism for the seen-ID set (in-memory, Redis, database), provided the chosen mechanism is consistent across all replicas that accept receipts.
 
 ### Observation Window

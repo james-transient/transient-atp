@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://atp.dev/schemas/decision.schema.json",
+  "$id": "https://schemas.transientintelligence.com/atp/decision.schema.json",
   "title": "ATP Decision",
   "type": "object",
   "required": [

@@ -52,7 +52,7 @@ GET /.well-known/atp-keys
 - The response MUST include all currently active keys.
 - The response SHOULD include recently retired keys for a minimum rotation window of 30 days.
 
-### Key resoltion by verifiers
+### Key resolution by verifiers
 
 When verifying a receipt, a verifier MUST:
 
@@ -65,6 +65,16 @@ When verifying a receipt, a verifier MUST:
 
 Verifiers SHOULD cache the JWKS response. Cache lifetime SHOULD NOT exceed 1 hour. Verifiers MUST re-fetch if a `kid` is not found in the cached set before failing permanently.
 
+## Trust Anchor Requirements
+
+Key distribution trust is anchored in the issuer origin. Verifiers MUST:
+
+1. Resolve `/.well-known/atp-keys` over HTTPS from the known issuer origin.
+2. Validate the TLS certificate chain using platform trust stores.
+3. Treat a TLS validation failure as a hard verification failure.
+
+Implementations MAY add stronger controls (for example certificate pinning, signed JWKS envelopes, or DNSSEC-backed origin validation). Where such controls are used, they SHOULD be documented in conformance declarations.
+
 ## Key Rotation
 
 Key rotation MUST follow this procedure:
@@ -76,6 +86,17 @@ Key rotation MUST follow this procedure:
 5. Remove the old key after the retention window.
 
 Clients MUST NOT assume a specific `kid` value is stable across deployments.
+
+## Emergency Key Revocation
+
+If signing key compromise is suspected, issuers MUST:
+
+1. Immediately stop signing with the compromised `kid`.
+2. Publish a replacement key with a new `kid`.
+3. Mark the compromised key as revoked in issuer-controlled metadata (for example, out-of-band incident bulletin or revocation endpoint).
+4. Reject receipt issuance with compromised keys from the revocation timestamp onward.
+
+ATP 1.0 does not define a universal CRL/OCSP-equivalent transport. Implementations SHOULD document revocation signaling channels and retention policy for compromised keys.
 
 ## Integration with Discovery
 

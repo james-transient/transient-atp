@@ -19,7 +19,7 @@ function parseBooleanFlag(argv, flag) {
 
 function usage() {
   console.log(`atp-conformance commands:
-  run [--openclaw-frames <path>] [--allow-local-artifacts]
+  run [--openclaw-frames <path>] [--runtimes-fixture <path>] [--allow-local-artifacts]
   validate --contract <path> --report <path>
   kit
   industry
@@ -40,6 +40,7 @@ async function main() {
   if (command === "run") {
     const report = await generateProofReport({
       openclawFramesPath: parseArg(argv, "--openclaw-frames", "conformance-kit/fixtures/openclaw/gateway-frames-live.json"),
+      runtimesFixturePath: parseArg(argv, "--runtimes-fixture"),
       allowLocalArtifacts: parseBooleanFlag(argv, "--allow-local-artifacts")
     });
     console.log(JSON.stringify(report, null, 2));

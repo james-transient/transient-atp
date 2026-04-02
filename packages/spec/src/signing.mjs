@@ -10,12 +10,6 @@ export function generateSigningKeyPair() {
   });
 }
 
-export function canonicalizeForSigning(receipt) {
-  const clone = structuredClone(receipt);
-  delete clone.signature;
-  return JSON.stringify(clone, Object.keys(clone).sort());
-}
-
 function sortedStringify(obj) {
   if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
     return JSON.stringify(obj);
@@ -24,10 +18,14 @@ function sortedStringify(obj) {
   return `{${Object.entries(sorted).map(([k, v]) => `${JSON.stringify(k)}:${sortedStringify(v)}`).join(",")}}`;
 }
 
-export function canonicalBytes(receipt) {
+export function canonicalJSONString(receipt) {
   const clone = structuredClone(receipt);
   delete clone.signature;
-  return Buffer.from(sortedStringify(clone), "utf8");
+  return sortedStringify(clone);
+}
+
+export function canonicalBytes(receipt) {
+  return Buffer.from(canonicalJSONString(receipt), "utf8");
 }
 
 export function signReceipt(receipt, privateKeyPem, keyId) {

@@ -36,6 +36,7 @@ Receipts are signed with Ed25519, tied to a public key published at `/.well-know
 | Path | Contents |
 |------|----------|
 | `spec/` | ATP 1.0 normative specification |
+| `spec/test-vectors/` | Canonicalization + signature interoperability vectors |
 | `conformance/` | Conformance checklist with stable requirement IDs (`ATP-L1-*`) |
 | `conformance-kit/` | Reproducible conformance contracts and verification artifacts |
 | `packages/spec` | `@atp/spec` — protocol constants, JSON schemas, Ed25519 signing, replay guard |
@@ -101,6 +102,7 @@ const { ok, reason } = guard.check(receipt);
 npm exec -- atp-conformance kit
 npm exec -- atp-conformance industry
 npm exec -- atp-conformance run --openclaw-frames conformance-kit/fixtures/openclaw/gateway-frames-live.json
+npm exec -- atp-conformance run --runtimes-fixture conformance-kit/fixtures/external/runtimes.v1.json
 ```
 
 ## Intended use
@@ -114,6 +116,8 @@ ATP is designed for teams that need to govern and audit autonomous agent behavio
 ## Versioning and releases
 
 See [`docs/VERSIONING_POLICY.md`](./docs/VERSIONING_POLICY.md) and [`docs/RELEASE_POLICY.md`](./docs/RELEASE_POLICY.md).
+
+Latest patch release notes: [`docs/RELEASE_NOTES_1.0.2.md`](./docs/RELEASE_NOTES_1.0.2.md).
 
 ## Acknowledgements
 

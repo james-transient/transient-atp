@@ -56,6 +56,17 @@ function sampleRuntimes(frames) {
   ];
 }
 
+export async function loadRuntimeFixture(pathLike, cwd = process.cwd()) {
+  const absolutePath = resolve(cwd, pathLike);
+  const raw = await readFile(absolutePath, "utf8");
+  const parsed = JSON.parse(raw);
+  const runtimes = Array.isArray(parsed) ? parsed : parsed?.runtimes;
+  if (!Array.isArray(runtimes) || runtimes.length === 0) {
+    throw new Error("Runtime fixture must be an array or object with non-empty 'runtimes' array.");
+  }
+  return runtimes;
+}
+
 export async function loadOpenclawFrames(pathLike, cwd = process.cwd()) {
   const absolutePath = resolve(cwd, pathLike);
   const raw = await readFile(absolutePath, "utf8");
@@ -80,9 +91,14 @@ export async function loadOpenclawFrames(pathLike, cwd = process.cwd()) {
 
 export async function generateProofReport({
   openclawFramesPath = "conformance-kit/fixtures/openclaw/gateway-frames-live.json",
+  runtimesFixturePath,
   allowLocalArtifacts = false,
   cwd = process.cwd()
 } = {}) {
+  if (runtimesFixturePath) {
+    const runtimes = await loadRuntimeFixture(runtimesFixturePath, cwd);
+    return runConformanceProofHarness({ runtimes });
+  }
   if (!allowLocalArtifacts) {
     const rawPath = String(openclawFramesPath ?? "");
     const loweredPath = rawPath.toLowerCase();

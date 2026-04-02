@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://atp.dev/schemas/receipt.schema.json",
+  "$id": "https://schemas.transientintelligence.com/atp/receipt.schema.json",
   "title": "ATP Receipt",
   "type": "object",
   "required": [
@@ -22,8 +22,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "type": "string",
-      "minLength": 1
+      "const": "1.0.0"
     },
     "receipt_id": {
       "type": "string",
@@ -55,8 +54,9 @@
             "version": { "type": "string" },
             "kid": { "type": "string", "minLength": 1 },
             "sig": { "type": "string", "minLength": 1 },
-            "canonicalization": { "type": "string" }
-          }
+            "canonicalization": { "const": "ATP-JCS-SORTED-UTF8" }
+          },
+          "additionalProperties": true
         },
         {
           "type": "string",
@@ -78,11 +78,12 @@
       "format": "date-time"
     },
     "event_snapshot": {
-      "type": "object"
+      "type": "object",
+      "minProperties": 1
     },
     "event_snapshot_hash": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^[a-f0-9]{64}$"
     },
     "correlation_id": {
       "type": "string",
@@ -95,7 +96,8 @@
       "properties": {
         "alg": { "type": "string", "enum": ["sha256"] },
         "digest": { "type": "string", "minLength": 1 }
-      }
+      },
+      "additionalProperties": false
     },
     "output_hash": {
       "type": "object",
@@ -104,7 +106,8 @@
       "properties": {
         "alg": { "type": "string", "enum": ["sha256"] },
         "digest": { "type": "string", "minLength": 1 }
-      }
+      },
+      "additionalProperties": false
     },
     "cost": {
       "type": "object",
@@ -115,13 +118,14 @@
         "currency": { "type": "string", "description": "ISO 4217 code or protocol-specific token symbol." },
         "unit": { "type": "string" },
         "payer": { "type": "string", "description": "Actor funding the action." }
-      }
+      },
+      "additionalProperties": false
     },
     "intent": {
-      "$ref": "https://atp.dev/schemas/intent.schema.json"
+      "$ref": "https://schemas.transientintelligence.com/atp/intent.schema.json"
     },
     "decision": {
-      "$ref": "https://atp.dev/schemas/decision.schema.json"
+      "$ref": "https://schemas.transientintelligence.com/atp/decision.schema.json"
     }
   },
   "additionalProperties": true

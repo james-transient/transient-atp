@@ -7,6 +7,7 @@ import { spawnSync } from "node:child_process";
 import { createSampleReceipt, validateReceiptATP } from "../src/lib/receipt.mjs";
 import { validateConformanceReport } from "../src/lib/contract-validate.mjs";
 import { evaluateRuntimeConformance } from "../src/lib/conformance.mjs";
+import { generateProofReport } from "../src/lib/proof-harness.mjs";
 import {
   evaluateReleaseGovernanceEvidence,
   validateReleaseGovernanceReport
@@ -70,6 +71,32 @@ test("Ed25519 signed receipt passes validateReceiptATP", () => {
   const signed = signReceipt(base, privateKey, "key-001");
   const result = validateReceiptATP(signed);
   assert.equal(result.ok, true);
+});
+
+test("sample receipt IDs are deterministic per run/session and not globally constant", () => {
+  const first = createSampleReceipt({
+    runId: "id-seed-a",
+    sessionId: "sess-a",
+    runStatus: "success",
+    haltReason: "none",
+    events: [{ eventType: "run_end", capturedAt: "2026-03-31T00:00:00.000Z" }]
+  });
+  const second = createSampleReceipt({
+    runId: "id-seed-b",
+    sessionId: "sess-b",
+    runStatus: "success",
+    haltReason: "none",
+    events: [{ eventType: "run_end", capturedAt: "2026-03-31T00:00:00.000Z" }]
+  });
+  const repeatFirst = createSampleReceipt({
+    runId: "id-seed-a",
+    sessionId: "sess-a",
+    runStatus: "success",
+    haltReason: "none",
+    events: [{ eventType: "run_end", capturedAt: "2026-03-31T00:00:00.000Z" }]
+  });
+  assert.notEqual(first.receipt_id, second.receipt_id);
+  assert.equal(first.receipt_id, repeatFirst.receipt_id);
 });
 
 test("legacy sha256 signature produces deprecation warning, not error", () => {
@@ -223,6 +250,50 @@ test("cli run command returns ATP report", async () => {
   assert.equal(parsed.overall, "PASS");
 });
 
+test("proof harness supports external runtimes fixture mode", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const report = await generateProofReport({
+    cwd: repoRoot,
+    runtimesFixturePath: "conformance-kit/fixtures/external/runtimes.v1.json"
+  });
+  assert.equal(report.protocol, "ATP");
+  assert.equal(Array.isArray(report.results), true);
+  assert.equal(report.results.length, 5);
+  assert.equal(report.results[0].runtimeId, "financial-flowers-allow-under-budget");
+  assert.equal(report.results[0].atpL1.signatureVerified, true);
+});
+
+test("cli run supports --runtimes-fixture", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const result = spawnSync(
+    process.execPath,
+    [
+      "packages/conformance-cli/src/cli.mjs",
+      "run",
+      "--runtimes-fixture",
+      "conformance-kit/fixtures/external/runtimes.v1.json"
+    ],
+    { cwd: repoRoot, encoding: "utf8" }
+  );
+  assert.equal(result.status, 0);
+  const parsed = JSON.parse(String(result.stdout ?? "{}"));
+  assert.equal(parsed.protocol, "ATP");
+  assert.equal(parsed.results?.[0]?.runtimeId, "financial-flowers-allow-under-budget");
+});
+
+test("external runtimes fixture validates against conformance contract", async () => {
+  const repoRoot = resolve(process.cwd(), "..", "..");
+  const report = await generateProofReport({
+    cwd: repoRoot,
+    runtimesFixturePath: "conformance-kit/fixtures/external/runtimes.v1.json"
+  });
+  const contract = JSON.parse(
+    await readFile(resolve(repoRoot, "conformance-kit/expected/contract.json"), "utf8")
+  );
+  const validation = validateConformanceReport(report, contract);
+  assert.equal(validation.ok, true);
+});
+
 test("cli validate command validates generated report", async () => {
   const repoRoot = resolve(process.cwd(), "..", "..");
   const kit = spawnSync(process.execPath, ["packages/conformance-cli/src/cli.mjs", "kit"], {
@@ -288,6 +359,27 @@ test("receipt validation rejects invalid captured_at datetime", () => {
   assert.equal(result.ok, false);
   const codes = new Set(result.issues.map((issue) => issue.code));
   assert.equal(codes.has("receipt_invalid_captured_at"), true);
+});
+
+test("receipt validation accepts RFC3339 fractional seconds beyond millisecond precision", () => {
+  const receipt = createSampleReceipt({
+    runId: "fractional-seconds",
+    sessionId: "fractional-seconds",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "run_start", capturedAt: "2026-03-31T00:00:00.1Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:00.123456Z" }
+    ]
+  });
+  receipt.occurred_at = "2026-03-31T00:00:00.1Z";
+  receipt.received_at = "2026-03-31T00:00:00.12Z";
+  receipt.sealed_at = "2026-03-31T00:00:00.123456Z";
+  receipt.captured_at = "2026-03-31T00:00:00.123456Z";
+  receipt.intent.requested_at = "2026-03-31T00:00:00.1Z";
+  receipt.decision.decided_at = "2026-03-31T00:00:00.123456Z";
+  const result = validateReceiptATP(receipt);
+  assert.equal(result.ok, true);
 });
 
 test("receipt validation rejects schema-incompatible receipt fields", () => {

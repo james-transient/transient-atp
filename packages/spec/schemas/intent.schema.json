@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://atp.dev/schemas/intent.schema.json",
+  "$id": "https://schemas.transientintelligence.com/atp/intent.schema.json",
   "title": "ATP Intent",
   "type": "object",
   "required": [

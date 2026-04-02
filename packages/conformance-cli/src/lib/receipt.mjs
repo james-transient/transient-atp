@@ -3,20 +3,12 @@ import {
   ATP_DECISION_OUTCOMES,
   ATP_EXECUTION_STATUSES,
   ATP_RECEIPT_VALIDATION_CODES,
-  ATP_DEPRECATED
+  ATP_DEPRECATED,
+  canonicalBytes
 } from "@atp/spec";
 
-export function stableStringify(value) {
-  if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
-  if (value && typeof value === "object") {
-    const keys = Object.keys(value).sort();
-    return `{${keys.map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`).join(",")}}`;
-  }
-  return JSON.stringify(value);
-}
-
 export function hashEventSnapshot(snapshot) {
-  return createHash("sha256").update(stableStringify(snapshot)).digest("hex");
+  return createHash("sha256").update(canonicalBytes(snapshot)).digest("hex");
 }
 
 function mapExecutionStatus(runStatus, haltReason) {
@@ -54,7 +46,8 @@ export function createSampleReceipt({
     events: Array.isArray(events) ? events : []
   };
   const eventSnapshotHash = hashEventSnapshot(eventSnapshot);
-  const numericId = "1775000000000000000";
+  const seed = `${String(runId ?? "")}:${String(sessionId ?? "")}:${String(action ?? "runtime_run")}`;
+  const numericId = String(BigInt(`0x${createHash("sha256").update(seed).digest("hex").slice(0, 16)}`));
   const executionStatus = mapExecutionStatus(runStatus, haltReason);
   const decisionOutcome = mapDecisionOutcome(executionStatus, haltReason);
 
@@ -101,7 +94,7 @@ export function validateReceiptATP(receipt) {
   const isObject = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
   const isStrictDateTime = (value) => {
     const input = String(value ?? "");
-    const pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?(?:Z|[+-]\d{2}:\d{2})$/;
+    const pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
     return pattern.test(input) && Number.isFinite(Date.parse(input));
   };
   const requireNonEmptyString = (value, path) => {

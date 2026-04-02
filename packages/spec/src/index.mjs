@@ -58,6 +58,7 @@ export {
   signReceipt,
   verifyReceiptSignature,
   receiptFingerprint,
+  canonicalJSONString,
   canonicalBytes,
   exportPublicKeyAsJwk,
   buildJwks

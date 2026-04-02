@@ -36,6 +36,7 @@ Run through the CLI package:
 ```bash
 npm exec -- atp-conformance kit
 npm exec -- atp-conformance industry
+npm exec -- atp-conformance run --runtimes-fixture conformance-kit/fixtures/external/runtimes.v1.json
 ```
 
 ## Outputs
@@ -66,6 +67,10 @@ The expected conformance contract is defined in:
 - `conformance-kit/expected/industry-gate.json`
 - `conformance-kit/expected/industry-gate.strict.json`
 - `conformance-kit/expected/release-governance.contract.json`
+
+External signed fixture corpus for interoperability checks:
+
+- `conformance-kit/fixtures/external/runtimes.v1.json`
 
 Validate an existing report against the contract:
 

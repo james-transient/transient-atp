@@ -1,0 +1,404 @@
+{
+  "runtimes": [
+    {
+      "runtimeId": "financial-flowers-allow-under-budget",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "evidence": {
+        "attestation": {
+          "trustReceiptSigned": true,
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAyRnqajbEzi0FUtklWcyLGJ1JmUiIEKaDQPu6uc9xcbM=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptKeyId": "external-runtime-key-001",
+          "keyDistribution": {
+            "published": true,
+            "endpoint": "/.well-known/atp-keys"
+          },
+          "replayProtection": {
+            "enabled": true,
+            "observationWindowSeconds": 300
+          },
+          "trustReceipt": {
+            "schemaVersion": "1.0.0",
+            "receipt_id": "TR-10836445060113977766",
+            "intent_id": "TI-10836445060113977766",
+            "decision_id": "TD-10836445060113977766",
+            "execution_status": "executed",
+            "captured_at": "2026-03-31T00:00:02.000Z",
+            "signature": {
+              "alg": "Ed25519",
+              "version": "ATP-ED25519-1",
+              "kid": "external-runtime-key-001",
+              "sig": "Zl6S5rIOg_xN8bX7WbOpXFpoYk2YySV5bXCJFVW4h18cSn_Yz--7s6qj2DEjwaj0cj_e8cVUMXL4FnVXwOoQDQ",
+              "canonicalization": "ATP-JCS-SORTED-UTF8"
+            },
+            "occurred_at": "2026-03-31T00:00:00.000Z",
+            "received_at": "2026-03-31T00:00:00.000Z",
+            "sealed_at": "2026-03-31T00:00:02.000Z",
+            "event_snapshot": {
+              "runId": "financial-flowers-allow-under-budget",
+              "sessionId": "sess-a",
+              "runStatus": "success",
+              "haltReason": "none",
+              "events": [
+                {
+                  "eventType": "tool_call_requested",
+                  "capturedAt": "2026-03-31T00:00:00.000Z"
+                },
+                {
+                  "eventType": "tool_call_executed",
+                  "capturedAt": "2026-03-31T00:00:01.000Z"
+                },
+                {
+                  "eventType": "run_end",
+                  "capturedAt": "2026-03-31T00:00:02.000Z"
+                }
+              ]
+            },
+            "event_snapshot_hash": "e12d8fe9e3c455893e6f6b34e81b18b05ff6fdd664bd449c6d05bdb12c21cc3d",
+            "correlation_id": "financial-flowers-allow-under-budget:sess-a:0",
+            "intent": {
+              "intent_id": "TI-10836445060113977766",
+              "actor_id": "runtime-orchestrator",
+              "connector": "transient-atp",
+              "action": "purchase_flowers",
+              "action_class": "write_high",
+              "target": {
+                "runtime": "external"
+              },
+              "context": {},
+              "governance_profile": "default",
+              "requested_at": "2026-03-31T00:00:00.000Z"
+            },
+            "decision": {
+              "decision_id": "TD-10836445060113977766",
+              "intent_id": "TI-10836445060113977766",
+              "outcome": "allow",
+              "reason_code": "none",
+              "decided_at": "2026-03-31T00:00:02.000Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "runtimeId": "financial-flowers-approve-over-budget",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "evidence": {
+        "attestation": {
+          "trustReceiptSigned": true,
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAaVoVFHikaCZR6FmYTh06aThCUsXnw6Oq6ls9LaTEnRU=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptKeyId": "external-runtime-key-002",
+          "keyDistribution": {
+            "published": true,
+            "endpoint": "/.well-known/atp-keys"
+          },
+          "replayProtection": {
+            "enabled": true,
+            "observationWindowSeconds": 300
+          },
+          "trustReceipt": {
+            "schemaVersion": "1.0.0",
+            "receipt_id": "TR-12695406145235022926",
+            "intent_id": "TI-12695406145235022926",
+            "decision_id": "TD-12695406145235022926",
+            "execution_status": "blocked",
+            "captured_at": "2026-03-31T00:00:02.000Z",
+            "signature": {
+              "alg": "Ed25519",
+              "version": "ATP-ED25519-1",
+              "kid": "external-runtime-key-002",
+              "sig": "JOH9CQfK1PDBkZ739hgRoUXioONgO3aR78Rmfh3OTdDL3zWUCp8Qkssb60ktHm-w_51CAkEn8wvLACnyjL4eCw",
+              "canonicalization": "ATP-JCS-SORTED-UTF8"
+            },
+            "occurred_at": "2026-03-31T00:00:00.000Z",
+            "received_at": "2026-03-31T00:00:00.000Z",
+            "sealed_at": "2026-03-31T00:00:02.000Z",
+            "event_snapshot": {
+              "runId": "financial-flowers-approve-over-budget",
+              "sessionId": "sess-b",
+              "runStatus": "halted",
+              "haltReason": "critical_approval_required",
+              "events": [
+                {
+                  "eventType": "tool_call_requested",
+                  "capturedAt": "2026-03-31T00:00:00.000Z"
+                },
+                {
+                  "eventType": "tool_call_executed",
+                  "capturedAt": "2026-03-31T00:00:01.000Z"
+                },
+                {
+                  "eventType": "run_end",
+                  "capturedAt": "2026-03-31T00:00:02.000Z"
+                }
+              ]
+            },
+            "event_snapshot_hash": "ce385cc416badfef57c43d68492781f658d63fb3adabcd0f18ec13d36d971aee",
+            "correlation_id": "financial-flowers-approve-over-budget:sess-b:0",
+            "intent": {
+              "intent_id": "TI-12695406145235022926",
+              "actor_id": "runtime-orchestrator",
+              "connector": "transient-atp",
+              "action": "purchase_flowers",
+              "action_class": "write_high",
+              "target": {
+                "runtime": "external"
+              },
+              "context": {},
+              "governance_profile": "default",
+              "requested_at": "2026-03-31T00:00:00.000Z"
+            },
+            "decision": {
+              "decision_id": "TD-12695406145235022926",
+              "intent_id": "TI-12695406145235022926",
+              "outcome": "approve",
+              "reason_code": "critical_approval_required",
+              "decided_at": "2026-03-31T00:00:02.000Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "runtimeId": "financial-flowers-deny-blocked-merchant",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "evidence": {
+        "attestation": {
+          "trustReceiptSigned": true,
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAkQh5Yz9yl96L6nCo9aIYGu4prd4ToCX9MdM8XoJAPT8=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptKeyId": "external-runtime-key-003",
+          "keyDistribution": {
+            "published": true,
+            "endpoint": "/.well-known/atp-keys"
+          },
+          "replayProtection": {
+            "enabled": true,
+            "observationWindowSeconds": 300
+          },
+          "trustReceipt": {
+            "schemaVersion": "1.0.0",
+            "receipt_id": "TR-4571501680426654385",
+            "intent_id": "TI-4571501680426654385",
+            "decision_id": "TD-4571501680426654385",
+            "execution_status": "blocked",
+            "captured_at": "2026-03-31T00:00:02.000Z",
+            "signature": {
+              "alg": "Ed25519",
+              "version": "ATP-ED25519-1",
+              "kid": "external-runtime-key-003",
+              "sig": "bJzaO871I-T_-OiyQrVtvayewLvPojAYxKHgUp-ZwjTLjjiiPUPfwID7uuVYSf0e2SKHXMRd9EblOw0uqeMKDg",
+              "canonicalization": "ATP-JCS-SORTED-UTF8"
+            },
+            "occurred_at": "2026-03-31T00:00:00.000Z",
+            "received_at": "2026-03-31T00:00:00.000Z",
+            "sealed_at": "2026-03-31T00:00:02.000Z",
+            "event_snapshot": {
+              "runId": "financial-flowers-deny-blocked-merchant",
+              "sessionId": "sess-c",
+              "runStatus": "halted",
+              "haltReason": "merchant_blocked_by_policy",
+              "events": [
+                {
+                  "eventType": "tool_call_requested",
+                  "capturedAt": "2026-03-31T00:00:00.000Z"
+                },
+                {
+                  "eventType": "tool_call_executed",
+                  "capturedAt": "2026-03-31T00:00:01.000Z"
+                },
+                {
+                  "eventType": "run_end",
+                  "capturedAt": "2026-03-31T00:00:02.000Z"
+                }
+              ]
+            },
+            "event_snapshot_hash": "ac20261050ae6de09a23cd0c976f471138a5aa04be2a1ac80eaa98265fae3b36",
+            "correlation_id": "financial-flowers-deny-blocked-merchant:sess-c:0",
+            "intent": {
+              "intent_id": "TI-4571501680426654385",
+              "actor_id": "runtime-orchestrator",
+              "connector": "transient-atp",
+              "action": "purchase_flowers",
+              "action_class": "write_high",
+              "target": {
+                "runtime": "external"
+              },
+              "context": {},
+              "governance_profile": "default",
+              "requested_at": "2026-03-31T00:00:00.000Z"
+            },
+            "decision": {
+              "decision_id": "TD-4571501680426654385",
+              "intent_id": "TI-4571501680426654385",
+              "outcome": "deny",
+              "reason_code": "merchant_blocked_by_policy",
+              "decided_at": "2026-03-31T00:00:02.000Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "runtimeId": "scenario-expired-approval-window",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "evidence": {
+        "attestation": {
+          "trustReceiptSigned": true,
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAmUj/me2wXnY2cBRBekhbkVdZl5kQb40Spm5ZSxABtWo=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptKeyId": "external-runtime-key-004",
+          "keyDistribution": {
+            "published": true,
+            "endpoint": "/.well-known/atp-keys"
+          },
+          "replayProtection": {
+            "enabled": true,
+            "observationWindowSeconds": 300
+          },
+          "trustReceipt": {
+            "schemaVersion": "1.0.0",
+            "receipt_id": "TR-1391482379520540908",
+            "intent_id": "TI-1391482379520540908",
+            "decision_id": "TD-1391482379520540908",
+            "execution_status": "expired",
+            "captured_at": "2026-03-31T00:00:02.000Z",
+            "signature": {
+              "alg": "Ed25519",
+              "version": "ATP-ED25519-1",
+              "kid": "external-runtime-key-004",
+              "sig": "KsabUCFyDPdBc4qTbXv6XBu6C6wIOnNPGyERaPROTHpTDyqNpryNO_iaBzgfMUfdtniBO8svZJGf6euZWp_GCQ",
+              "canonicalization": "ATP-JCS-SORTED-UTF8"
+            },
+            "occurred_at": "2026-03-31T00:00:00.000Z",
+            "received_at": "2026-03-31T00:00:00.000Z",
+            "sealed_at": "2026-03-31T00:00:02.000Z",
+            "event_snapshot": {
+              "runId": "scenario-expired-approval-window",
+              "sessionId": "sess-d",
+              "runStatus": "halted",
+              "haltReason": "timeout",
+              "events": [
+                {
+                  "eventType": "tool_call_requested",
+                  "capturedAt": "2026-03-31T00:00:00.000Z"
+                },
+                {
+                  "eventType": "tool_call_executed",
+                  "capturedAt": "2026-03-31T00:00:01.000Z"
+                },
+                {
+                  "eventType": "run_end",
+                  "capturedAt": "2026-03-31T00:00:02.000Z"
+                }
+              ]
+            },
+            "event_snapshot_hash": "40b082dfb7878be38a7c964df4e3fed9be091f8d3476a21351a7a4aef42ac07f",
+            "correlation_id": "scenario-expired-approval-window:sess-d:0",
+            "intent": {
+              "intent_id": "TI-1391482379520540908",
+              "actor_id": "runtime-orchestrator",
+              "connector": "transient-atp",
+              "action": "purchase_flowers",
+              "action_class": "write_high",
+              "target": {
+                "runtime": "external"
+              },
+              "context": {},
+              "governance_profile": "default",
+              "requested_at": "2026-03-31T00:00:00.000Z"
+            },
+            "decision": {
+              "decision_id": "TD-1391482379520540908",
+              "intent_id": "TI-1391482379520540908",
+              "outcome": "deny",
+              "reason_code": "timeout",
+              "decided_at": "2026-03-31T00:00:02.000Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "runtimeId": "scenario-error-runtime-failure",
+      "requiredLevel": "CLASSIFY_ONLY",
+      "requiredAtpL1": true,
+      "evidence": {
+        "attestation": {
+          "trustReceiptSigned": true,
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAZiivz6ztyzfZegStqjn4ot0/gp8mHYoAxLXNEFXleBo=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptKeyId": "external-runtime-key-005",
+          "keyDistribution": {
+            "published": true,
+            "endpoint": "/.well-known/atp-keys"
+          },
+          "replayProtection": {
+            "enabled": true,
+            "observationWindowSeconds": 300
+          },
+          "trustReceipt": {
+            "schemaVersion": "1.0.0",
+            "receipt_id": "TR-2600524594693414184",
+            "intent_id": "TI-2600524594693414184",
+            "decision_id": "TD-2600524594693414184",
+            "execution_status": "error",
+            "captured_at": "2026-03-31T00:00:02.000Z",
+            "signature": {
+              "alg": "Ed25519",
+              "version": "ATP-ED25519-1",
+              "kid": "external-runtime-key-005",
+              "sig": "0zSEDQBgg82YTlXuJD1jROuuwCgLJhhautGad51Ffq8I66eE1C5MeJLEUle0taSznHtrRZHfqKTdtYE_J4sKDw",
+              "canonicalization": "ATP-JCS-SORTED-UTF8"
+            },
+            "occurred_at": "2026-03-31T00:00:00.000Z",
+            "received_at": "2026-03-31T00:00:00.000Z",
+            "sealed_at": "2026-03-31T00:00:02.000Z",
+            "event_snapshot": {
+              "runId": "scenario-error-runtime-failure",
+              "sessionId": "sess-e",
+              "runStatus": "halted",
+              "haltReason": "runtime_exception",
+              "events": [
+                {
+                  "eventType": "tool_call_requested",
+                  "capturedAt": "2026-03-31T00:00:00.000Z"
+                },
+                {
+                  "eventType": "tool_call_executed",
+                  "capturedAt": "2026-03-31T00:00:01.000Z"
+                },
+                {
+                  "eventType": "run_end",
+                  "capturedAt": "2026-03-31T00:00:02.000Z"
+                }
+              ]
+            },
+            "event_snapshot_hash": "029a75d81d3b614056d253d5779655a5baca524a936ed647f521e181c6ff4e5f",
+            "correlation_id": "scenario-error-runtime-failure:sess-e:0",
+            "intent": {
+              "intent_id": "TI-2600524594693414184",
+              "actor_id": "runtime-orchestrator",
+              "connector": "transient-atp",
+              "action": "purchase_flowers",
+              "action_class": "write_high",
+              "target": {
+                "runtime": "external"
+              },
+              "context": {},
+              "governance_profile": "default",
+              "requested_at": "2026-03-31T00:00:00.000Z"
+            },
+            "decision": {
+              "decision_id": "TD-2600524594693414184",
+              "intent_id": "TI-2600524594693414184",
+              "outcome": "deny",
+              "reason_code": "runtime_exception",
+              "decided_at": "2026-03-31T00:00:02.000Z"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

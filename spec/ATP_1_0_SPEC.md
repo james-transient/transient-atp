@@ -53,7 +53,7 @@ ATP is a protocol for governing and verifying autonomous agent actions against a
 
 ## Signing
 
-ATP 1.0 SHOULD use Ed25519 with canonical JSON serialization for receipt signing.
+ATP 1.0 ATP-L1 conformance MUST use Ed25519 with canonical JSON serialization for receipt signing.
 
 ATP's signing model draws on established patterns in the agent attestation space, including Ed25519 and canonical JSON serialization as used by W3C Verifiable Credentials, JSON Web Signatures (RFC 7515), and similar protocols. The `ATP-JCS-SORTED-UTF8` canonicalization is ATP's own scheme, chosen for simplicity of independent implementation.
 
@@ -66,8 +66,14 @@ The signing payload MUST be constructed as follows:
 1. Clone the full receipt object.
 2. Remove the `signature` field from the clone.
 3. Recursively sort all object keys lexicographically.
-4. Serialize to JSON with no insignificant whitespace.
-5. Encode as UTF-8 bytes.
+4. Preserve array element order exactly as provided.
+5. Serialize primitive values using ECMAScript JSON semantics (`JSON.stringify`) with no insignificant whitespace.
+6. Do not apply Unicode normalization; strings are serialized as provided.
+7. Encode as UTF-8 bytes.
+
+Normative canonicalization and signature test vectors are published in:
+
+- `spec/test-vectors/canonicalization-signature.v1.json`
 
 ### Signature Object
 
@@ -79,7 +85,7 @@ When Ed25519 signing is used, `signature` MUST be an object with:
 - `canonicalization` (string, REQUIRED): MUST be `ATP-JCS-SORTED-UTF8`.
 - `version` (string, OPTIONAL): signing version identifier.
 
-Implementations using legacy hash-only signatures MUST use format `sha256:<64-hex>`. Implementations SHOULD migrate to Ed25519 object form. The `sha256:` string form is deprecated as of ATP 1.0 and MUST NOT be accepted in ATP 2.0. Validators MUST surface a deprecation warning when this form is presented.
+Implementations MAY parse legacy hash-only signatures in format `sha256:<64-hex>` to support migration workflows, but this form is not sufficient for ATP-L1 conformance. The `sha256:` string form is deprecated as of ATP 1.0 and MUST NOT be accepted in ATP 2.0. Validators MUST surface a deprecation warning when this form is presented.
 
 ### Verification
 
@@ -153,6 +159,7 @@ Services advertising ATP support SHOULD expose `/.well-known/atp-config` with a 
 - **Replay protection:** consumers MUST enforce uniqueness of `receipt_id` within a bounded observation window of at least 5 minutes. See `ATP_1_0_TRANSPORT.md § Replay Protection`.
 - **Privacy:** raw inputs and outputs SHOULD NOT be embedded in receipts. Use `input_hash`/`output_hash`.
 - **Canonicalization safety:** signing and verifying implementations MUST use identical canonicalisation. Divergence invalidates signatures.
+- **Issuer trust context:** verifiers MUST know the issuing origin before resolving `signature.kid` and MUST treat the issuer origin and JWKS endpoint as part of the trust boundary.
 
 ## Conformance
 
