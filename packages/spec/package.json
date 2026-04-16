@@ -1,6 +1,6 @@
 {
   "name": "@atp-protocol/spec",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "ATP protocol constants and JSON schemas.",
   "license": "Apache-2.0",
   "author": "James Everest <james@transientintelligence.com> (https://transientintelligence.com)",
@@ -13,7 +13,8 @@
   },
   "files": [
     "src",
-    "schemas"
+    "schemas",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"
