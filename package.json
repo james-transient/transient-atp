@@ -22,6 +22,7 @@
     "test:release-guard": "npm run -w @atp/release-guard test"
   },
   "dependencies": {
+    "base64-url": "^2.3.3",
     "canonicalize": "^2.1.0"
   }
 }

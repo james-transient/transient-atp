@@ -1,8 +1,22 @@
 import { sign as cryptoSign, verify as cryptoVerify, generateKeyPairSync, createHash, createPublicKey } from "node:crypto";
 import canonicalize from "canonicalize";
+import base64Url from "base64-url";
 
 export const ATP_SIGNING_ALGORITHM = "Ed25519";
 export const ATP_SIGNING_VERSION = "ATP-ED25519-1";
+
+const BASE64_URL_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+function encodeBase64Url(buffer) {
+  return base64Url.escape(buffer.toString("base64"));
+}
+
+function decodeBase64Url(value) {
+  if (typeof value !== "string" || value.trim().length === 0 || !BASE64_URL_PATTERN.test(value)) {
+    throw new Error("signature must be base64url (A-Z, a-z, 0-9, -, _)");
+  }
+  return Buffer.from(base64Url.unescape(value), "base64");
+}
 
 export function generateSigningKeyPair() {
   return generateKeyPairSync("ed25519", {
@@ -12,9 +26,16 @@ export function generateSigningKeyPair() {
 }
 
 export function canonicalJSONString(receipt) {
+  if (!receipt || typeof receipt !== "object" || Array.isArray(receipt)) {
+    throw new TypeError("receipt must be a non-null object");
+  }
   const clone = structuredClone(receipt);
   delete clone.signature;
-  return canonicalize(clone);
+  const canonical = canonicalize(clone);
+  if (typeof canonical !== "string") {
+    throw new TypeError("failed to canonicalize receipt to RFC8785-JCS string");
+  }
+  return canonical;
 }
 
 export function canonicalBytes(receipt) {
@@ -24,7 +45,7 @@ export function canonicalBytes(receipt) {
 export function signReceipt(receipt, privateKeyPem, keyId) {
   const payload = canonicalBytes(receipt);
   const sigBuffer = cryptoSign(null, payload, privateKeyPem);
-  const sig = sigBuffer.toString("base64url");
+  const sig = encodeBase64Url(sigBuffer);
   return {
     ...receipt,
     signature: {
@@ -42,8 +63,14 @@ export function verifyReceiptSignature(receipt, publicKeyPem, options = {}) {
   if (!sig || typeof sig !== "object") {
     return { ok: false, reason: "receipt_invalid_signature", detail: "signature object missing" };
   }
+  if (typeof publicKeyPem !== "string" || publicKeyPem.trim().length === 0) {
+    return { ok: false, reason: "receipt_invalid_signature", detail: "public key missing or empty" };
+  }
   if (sig.alg !== ATP_SIGNING_ALGORITHM) {
     return { ok: false, reason: "receipt_invalid_signature", detail: `unsupported algorithm '${sig.alg}'` };
+  }
+  if (sig.version !== undefined && sig.version !== ATP_SIGNING_VERSION) {
+    return { ok: false, reason: "receipt_invalid_signature", detail: `unsupported signature version '${sig.version}'` };
   }
   if (sig.canonicalization !== "RFC8785-JCS") {
     return {
@@ -67,7 +94,10 @@ export function verifyReceiptSignature(receipt, publicKeyPem, options = {}) {
   }
   try {
     const payload = canonicalBytes(receipt);
-    const sigBuffer = Buffer.from(sig.sig, "base64url");
+    const sigBuffer = decodeBase64Url(sig.sig);
+    if (sigBuffer.length !== 64) {
+      return { ok: false, reason: "receipt_invalid_signature", detail: "Ed25519 signature must be exactly 64 bytes" };
+    }
     const valid = cryptoVerify(null, payload, publicKeyPem, sigBuffer);
     if (!valid) return { ok: false, reason: "receipt_signature_verification_failed", detail: "signature mismatch" };
     return { ok: true };

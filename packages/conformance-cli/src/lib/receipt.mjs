@@ -153,8 +153,8 @@ export function validateReceiptATP(receipt) {
     isObject(s) &&
     s.alg === "Ed25519" &&
     typeof s.kid === "string" && s.kid.trim().length > 0 &&
-    typeof s.sig === "string" && s.sig.trim().length > 0 &&
-    (s.canonicalization === "RFC8785-JCS" || s.canonicalization === "ATP-JCS-SORTED-UTF8");
+    typeof s.sig === "string" && /^[A-Za-z0-9_-]+$/.test(s.sig) &&
+    s.canonicalization === "RFC8785-JCS";
   const isLegacySig = (s) => typeof s === "string" && /^sha256:[a-f0-9]{64}$/.test(s);
   if (!isEd25519Sig(sig) && !isLegacySig(sig)) {
     add(
