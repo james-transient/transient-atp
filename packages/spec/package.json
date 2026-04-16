@@ -15,6 +15,9 @@
     "src",
     "schemas"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "test": "node --test ./test/smoke.test.mjs"
   },
