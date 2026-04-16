@@ -8,6 +8,37 @@ Protocol constants, JSON schemas, Ed25519 signing, and replay protection for the
 npm install @atp-protocol/spec
 ```
 
+## Quick test
+
+After installing, paste this into a `.mjs` file and run it with `node`:
+
+```js
+import { createHash } from 'node:crypto';
+import {
+  ATP_PROTOCOL, ATP_VERSION,
+  generateSigningKeyPair, signReceipt, verifyReceiptSignature, canonicalBytes
+} from '@atp-protocol/spec';
+
+const { publicKey, privateKey } = generateSigningKeyPair();
+const snapshot = { action: 'test' };
+const now = new Date().toISOString();
+
+const receipt = {
+  receipt_id: 'TR-1', intent_id: 'TI-1', decision_id: 'TD-1',
+  execution_status: 'executed', schemaVersion: '1.0.0',
+  occurred_at: now, received_at: now, sealed_at: now, captured_at: now,
+  event_snapshot: snapshot,
+  event_snapshot_hash: createHash('sha256').update(canonicalBytes(snapshot)).digest('hex'),
+  correlation_id: 'sess-1'
+};
+
+const signed = signReceipt(receipt, privateKey, 'my-key');
+const { ok } = verifyReceiptSignature(signed, publicKey);
+
+console.log(`${ATP_PROTOCOL} ${ATP_VERSION} — sign + verify: ${ok ? 'PASS' : 'FAIL'}`);
+// ATP 1.0 — sign + verify: PASS
+```
+
 ## Usage
 
 ### Protocol constants
