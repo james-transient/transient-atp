@@ -20,14 +20,14 @@ jobs:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies for @atp/spec
+        run: cd packages/spec && npm ci
 
       - name: Run @atp/spec tests
         run: cd packages/spec && npm test
 
       - name: Publish @atp/spec to NPM
-        run: npm publish --workspace @atp/spec
+        run: cd packages/spec && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
