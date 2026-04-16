@@ -46,7 +46,7 @@ The key words MUST, MUST NOT, REQUIRED, SHALL, SHOULD, SHOULD NOT, RECOMMENDED, 
 - `ATP-L1-SIG-001`: `signature` MUST be present and MUST NOT be empty.
 - `ATP-L1-SIG-002`: ATP-L1 conformant receipts MUST use the Ed25519 signing object form (`alg`, `kid`, `sig`, `canonicalization`).
 - `ATP-L1-SIG-003`: Implementations parsing legacy hash form MUST enforce pattern `sha256:<64-hex>` and MUST surface deprecation warnings; this form is non-conformant for ATP-L1 PASS.
-- `ATP-L1-SIG-004`: The signing payload MUST be constructed using canonicalization algorithm `ATP-JCS-SORTED-UTF8` with the `signature` field removed.
+- `ATP-L1-SIG-004`: The signing payload MUST be constructed using canonicalization algorithm `RFC8785-JCS` with the `signature` field removed.
 
 ### Decision Semantics
 
