@@ -24,9 +24,13 @@ console.log(ATP_EXECUTION_STATUSES);// ["executed", "blocked", "expired", "error
 ### Sign and verify a receipt
 
 ```js
-import { generateSigningKeyPair, signReceipt, verifyReceiptSignature } from '@atp-protocol/spec';
+import { createHash } from 'node:crypto';
+import { generateSigningKeyPair, signReceipt, verifyReceiptSignature, canonicalBytes } from '@atp-protocol/spec';
 
 const { publicKey, privateKey } = generateSigningKeyPair();
+
+const eventSnapshot = { action: 'purchase', item: 'flowers' };
+const now = new Date().toISOString();
 
 const receipt = {
   receipt_id: 'TR-123',
@@ -34,12 +38,12 @@ const receipt = {
   decision_id: 'TD-789',
   execution_status: 'executed',
   schemaVersion: '1.0.0',
-  occurred_at: new Date().toISOString(),
-  received_at: new Date().toISOString(),
-  sealed_at: new Date().toISOString(),
-  captured_at: new Date().toISOString(),
-  event_snapshot: { action: 'purchase' },
-  event_snapshot_hash: '...',
+  occurred_at: now,
+  received_at: now,
+  sealed_at: now,
+  captured_at: now,
+  event_snapshot: eventSnapshot,
+  event_snapshot_hash: createHash('sha256').update(canonicalBytes(eventSnapshot)).digest('hex'),
   correlation_id: 'sess-1'
 };
 
