@@ -140,6 +140,27 @@ test("receipt validation rejects Ed25519 signature with non-ATP canonicalization
   assert.equal(codes.has("receipt_invalid_signature_format"), true);
 });
 
+test("receipt validation rejects Ed25519 signature with non-base64url payload", () => {
+  const { privateKey } = generateSigningKeyPair();
+  const receipt = createSampleReceipt({
+    runId: "invalid-base64url",
+    sessionId: "invalid-base64url",
+    runStatus: "success",
+    haltReason: "none",
+    events: [
+      { eventType: "tool_call_requested", capturedAt: "2026-03-31T00:00:00.000Z" },
+      { eventType: "tool_call_executed", capturedAt: "2026-03-31T00:00:01.000Z" },
+      { eventType: "run_end", capturedAt: "2026-03-31T00:00:02.000Z" }
+    ]
+  });
+  const signed = signReceipt(receipt, privateKey, "canon-key-002");
+  signed.signature.sig = `${signed.signature.sig}+`;
+  const result = validateReceiptATP(signed);
+  assert.equal(result.ok, false);
+  const codes = new Set(result.issues.map((issue) => issue.code));
+  assert.equal(codes.has("receipt_invalid_signature_format"), true);
+});
+
 test("runtime conformance fails forged legacy signature even when trustReceiptSigned is true", () => {
   const receipt = createSampleReceipt({
     runId: "forged-legacy",
@@ -773,7 +794,7 @@ test("release governance validate rejects forged report with fabricated checks",
         alg: "Ed25519",
         kid: "forged",
         sig: "forged",
-        canonicalization: "ATP-JCS-SORTED-UTF8"
+        canonicalization: "RFC8785-JCS"
       },
       occurred_at: "2026-03-31T00:00:00.000Z",
       received_at: "2026-03-31T00:00:01.000Z",
