@@ -122,8 +122,6 @@ ATP is designed for teams that need to govern and audit autonomous agent behavio
 
 See [`docs/VERSIONING_POLICY.md`](./docs/VERSIONING_POLICY.md) and [`docs/RELEASE_POLICY.md`](./docs/RELEASE_POLICY.md).
 
-Latest patch release notes: [`docs/RELEASE_NOTES_1.0.2.md`](./docs/RELEASE_NOTES_1.0.2.md).
-
 ## Acknowledgements
 
 See [`ACKNOWLEDGEMENTS.md`](./ACKNOWLEDGEMENTS.md) for standards and prior work that informed this specification.
