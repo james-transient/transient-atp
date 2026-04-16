@@ -10,6 +10,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE)
 [![Spec](https://img.shields.io/badge/spec-ATP%201.0-green.svg)](./spec/ATP_1_0_SPEC.md)
 [![Conformance](https://img.shields.io/badge/conformance-machine--verified-brightgreen.svg)](./conformance-kit/)
+[![npm](https://img.shields.io/npm/v/@atp-protocol/spec.svg)](https://www.npmjs.com/package/@atp-protocol/spec)
 
 *Created and maintained by [Transient Intelligence Ltd](https://transientintelligence.com)*
 
@@ -39,7 +40,7 @@ Receipts are signed with Ed25519, tied to a public key published at `/.well-know
 | `spec/test-vectors/` | Canonicalization + signature interoperability vectors |
 | `conformance/` | Conformance checklist with stable requirement IDs (`ATP-L1-*`) |
 | `conformance-kit/` | Reproducible conformance contracts and verification artifacts |
-| `packages/spec` | `@atp/spec` — protocol constants, JSON schemas, Ed25519 signing, replay guard |
+| `packages/spec` | [`@atp-protocol/spec`](https://www.npmjs.com/package/@atp-protocol/spec) — protocol constants, JSON schemas, Ed25519 signing, replay guard |
 | `packages/conformance-cli` | `@atp/conformance-cli` — conformance runner and validator CLI |
 | `packages/release-guard` | `@atp/release-guard` — non-normative reference CLI for release governance process profile |
 
@@ -73,10 +74,14 @@ npm run conformance:industry:strict   # higher-assurance profile
 
 ## Using the packages
 
+```bash
+npm install @atp-protocol/spec
+```
+
 **Sign and verify a receipt:**
 
 ```js
-import { generateSigningKeyPair, signReceipt, verifyReceiptSignature, exportPublicKeyAsJwk, buildJwks } from '@atp/spec';
+import { generateSigningKeyPair, signReceipt, verifyReceiptSignature, exportPublicKeyAsJwk, buildJwks } from '@atp-protocol/spec';
 
 const { privateKey, publicKey } = generateSigningKeyPair();
 const signed = signReceipt(receipt, privateKey, 'key-2026-01');
@@ -90,7 +95,7 @@ const { ok } = verifyReceiptSignature(signed, publicKey);
 **Enforce replay protection:**
 
 ```js
-import { ReplayGuard } from '@atp/spec';
+import { ReplayGuard } from '@atp-protocol/spec';
 
 const guard = new ReplayGuard(); // 5 minute window, 30 second clock skew tolerance
 const { ok, reason } = guard.check(receipt);
