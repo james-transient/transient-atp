@@ -7,7 +7,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAq/1Dd3d3bV183WF9xVTN+9AefAKyz7Cd5ObPORDssVQ=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAIiGFbbtK2xY3QtYpebvW4dsVmnkO/ZbQN/BX9IjNHAA=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-001",
           "keyDistribution": {
             "published": true,
@@ -19,16 +19,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450809646831",
-            "intent_id": "TI-17763290450798081022",
-            "decision_id": "TD-17763290450799218530",
+            "receipt_id": "TR-17763315768863544026",
+            "intent_id": "TI-17763315768853646796",
+            "decision_id": "TD-17763315768851427405",
             "execution_status": "executed",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-001",
-              "sig": "fe4ivFAJ7JUb1ae-ZaPUGNlsC09O8HpUxkCiRsi7GbYMN5rX8BUzkglPAbBGi-KLFbTUepLUdKWfscY1i9CbDA",
+              "sig": "s4msaUC7h8tUWsawds88ckxobjvwUGWNvIvqZE9TT92WiNTCVEkt1xGb11xeo3XB7rSC08lZBjWF--ie-C04CQ",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -54,10 +54,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "99bb35202a0b447c343b9d176e8a2369904e0ba125f7741226ebd90f7e2e6847",
+            "event_snapshot_hash": "92566753b5878bed2388c05693d23836ed404126349d7dca3249fff37c740081",
             "correlation_id": "financial-flowers-allow-under-budget:sess-1:0",
             "intent": {
-              "intent_id": "TI-17763290450798081022",
+              "intent_id": "TI-17763315768853646796",
               "actor_id": "runtime-orchestrator",
               "connector": "transient-atp",
               "action": "purchase_flowers",
@@ -70,8 +70,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450799218530",
-              "intent_id": "TI-17763290450798081022",
+              "decision_id": "TD-17763315768851427405",
+              "intent_id": "TI-17763315768853646796",
               "outcome": "allow",
               "reason_code": "none",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -87,7 +87,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAYsSVdDLb0hiDbF+VeVTmIyBzCjJA/rsPDT5LuBo6VoM=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEABzj1yB9e2xWTIlbV0G1u7m4qTJrtrczgERLwy0oxze0=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-002",
           "keyDistribution": {
             "published": true,
@@ -99,16 +99,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450814615296",
-            "intent_id": "TI-17763290450801725378",
-            "decision_id": "TD-17763290450802286343",
+            "receipt_id": "TR-17763315768868552101",
+            "intent_id": "TI-17763315768864360020",
+            "decision_id": "TD-17763315768860014971",
             "execution_status": "blocked",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-002",
-              "sig": "0l815fQ4YvXm10X0JzNpoy0YJi4rsAUMjiQKa_-RJXBmNW80yn43J-eKyLhXCG0Wsr7JHCAkTi7--c-B2JEeCQ",
+              "sig": "6HZS7DlTHhyPWe30zE8yK_L-51tXXq4PJCl__VIRu6xMlk45_YGWyGkLDeWWXZceILmk6JajZxVbx2_-OlpBAA",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -134,10 +134,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "10ee92c0bc7c7ca2814c991e1548454f33db5621a6a28b11fb872163c8ad58d7",
+            "event_snapshot_hash": "6631d0d5e4466589a35b0c2e1c8ac7812fd568e08601e57bcaef410f61d8c05a",
             "correlation_id": "financial-flowers-approve-over-budget:sess-2:0",
             "intent": {
-              "intent_id": "TI-17763290450801725378",
+              "intent_id": "TI-17763315768864360020",
               "actor_id": "runtime-orchestrator",
               "connector": "transient-atp",
               "action": "purchase_flowers",
@@ -150,8 +150,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450802286343",
-              "intent_id": "TI-17763290450801725378",
+              "decision_id": "TD-17763315768860014971",
+              "intent_id": "TI-17763315768864360020",
               "outcome": "approve",
               "reason_code": "critical_approval_required",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -167,7 +167,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA7+TZ/V8Mp8QqHHUly+j/WofCr1+ir44aG6h5P2P4mqo=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAOMcyxhymhuid6baFkwQKkU24bG1tYYE/CALctq0Cr2E=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-003",
           "keyDistribution": {
             "published": true,
@@ -179,16 +179,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450816827374",
-            "intent_id": "TI-17763290450812379105",
-            "decision_id": "TD-17763290450816627743",
+            "receipt_id": "TR-17763315768874849740",
+            "intent_id": "TI-17763315768870474778",
+            "decision_id": "TD-17763315768876139173",
             "execution_status": "blocked",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-003",
-              "sig": "0Imte74TtWh1vvwfrYK_KKmvXkIrGfKOHduM2q3lLlFBQceaF4qK_vTdpFjrK4vhnW1S20PUtoQ2cQCCzP2aAg",
+              "sig": "JQsRJZitjt_ZQe_VNOaLl0wvzNwmFU-XRUeQ1rHI9EO37LxcjDKIJxj9I7LKPYBa7GbkNSTkKeWZ5ZhaSoUhBA",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -214,10 +214,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "ec78b72bb5c050a7ff7ee07275e23697fcb52a57f04b4c422f51bfd8f4377e3c",
+            "event_snapshot_hash": "3ada5fcf320c78eb0acd059bbec04228b5163e2fb08eb7cb104efcc1b921e9ca",
             "correlation_id": "financial-flowers-deny-blocked-merchant:sess-3:0",
             "intent": {
-              "intent_id": "TI-17763290450812379105",
+              "intent_id": "TI-17763315768870474778",
               "actor_id": "runtime-orchestrator",
               "connector": "transient-atp",
               "action": "purchase_flowers",
@@ -230,8 +230,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450816627743",
-              "intent_id": "TI-17763290450812379105",
+              "decision_id": "TD-17763315768876139173",
+              "intent_id": "TI-17763315768870474778",
               "outcome": "deny",
               "reason_code": "merchant_blocked_by_policy",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -247,7 +247,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAnn0L/f3aXWaNXBiN+NFq25l7h8I8acL+aQ5XTum+5OQ=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAwwiktobPIat9M9qJKCNghGK1y9kNyOt0gUWMhWqc9oI=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-004",
           "keyDistribution": {
             "published": true,
@@ -259,16 +259,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450818796983",
-            "intent_id": "TI-17763290450810842555",
-            "decision_id": "TD-17763290450813578761",
+            "receipt_id": "TR-17763315768871449042",
+            "intent_id": "TI-17763315768870889351",
+            "decision_id": "TD-17763315768879657299",
             "execution_status": "expired",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-004",
-              "sig": "cmbfAj4RQx8dOje9PLk7jTsWLTGId91PBszEd1kdKGtCbBe81ESAmN9wREE77gBQvsXQVr6dHOrTQlqyL5D6DA",
+              "sig": "SD-zfSYiP8UqNOKW0GcU-RVKENYrDU7T4CQInD-JEmzytPYYC-CKIi1VFpmmXCll9hOjhWpqNt0Dmsez-3cJCA",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -294,10 +294,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "836e1f8107a345ef8aedb0db06d923083ca2b814108e90777565038a3a1bd3a1",
+            "event_snapshot_hash": "cb994a34cb1631a874fad0cf5da52f7b381e0e28451777f42b0c883cb16e5f1c",
             "correlation_id": "scenario-expired-approval-window:sess-4:0",
             "intent": {
-              "intent_id": "TI-17763290450810842555",
+              "intent_id": "TI-17763315768870889351",
               "actor_id": "runtime-orchestrator",
               "connector": "transient-atp",
               "action": "purchase_flowers",
@@ -310,8 +310,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450813578761",
-              "intent_id": "TI-17763290450810842555",
+              "decision_id": "TD-17763315768879657299",
+              "intent_id": "TI-17763315768870889351",
               "outcome": "deny",
               "reason_code": "timeout",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -327,7 +327,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAMU1R8/ViUFk6YHp3rdcYX19/nzZR3FBNc1ELQ9aVoHk=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAvnzckHFxAPNyxL1Lf5pr71rdLHX6Lcqtwfu1EkI/bvw=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-005",
           "keyDistribution": {
             "published": true,
@@ -339,16 +339,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450823985538",
-            "intent_id": "TI-17763290450810604439",
-            "decision_id": "TD-17763290450815221909",
+            "receipt_id": "TR-17763315768884452358",
+            "intent_id": "TI-17763315768886667687",
+            "decision_id": "TD-17763315768888743681",
             "execution_status": "error",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-005",
-              "sig": "YFuo97HaJTNEkntwy6vDT4QaC77fBPrJGtysk8xuvOdVAV0kfG9jQPMGt8-jjVT98gHhBFIj3Om8vZL7_bTbDQ",
+              "sig": "i67hmPOuFPd_w2gKltiI3pzh8yYbS1gHtAUKvbW7-uZ_lKluc0Vmodlwj3PAuCqA3P2fKhzcDt_S0gHCGUikCQ",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -374,10 +374,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "7d921b718f38d29915729e27e63f865c5dda58cc11228a966dcc41bb5a4f3949",
+            "event_snapshot_hash": "590eb9fce080838d8a4e3d4eac4cfb504ccbc93f2067a00bd41e858fa5e87514",
             "correlation_id": "scenario-error-runtime-failure:sess-5:0",
             "intent": {
-              "intent_id": "TI-17763290450810604439",
+              "intent_id": "TI-17763315768886667687",
               "actor_id": "runtime-orchestrator",
               "connector": "transient-atp",
               "action": "purchase_flowers",
@@ -390,8 +390,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450815221909",
-              "intent_id": "TI-17763290450810604439",
+              "decision_id": "TD-17763315768888743681",
+              "intent_id": "TI-17763315768886667687",
               "outcome": "deny",
               "reason_code": "runtime_exception",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -407,7 +407,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAgn8HLMt86tncIOq/LqHLxPgvCynyJn74iBOVYVVvrS4=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEARpGWoo0TwuKKxtgizOoJzCMWWnliRFLDUoTM81qQATE=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-006",
           "keyDistribution": {
             "published": true,
@@ -419,16 +419,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450827505311",
-            "intent_id": "TI-17763290450824272217",
-            "decision_id": "TD-17763290450827792281",
+            "receipt_id": "TR-17763315768889168867",
+            "intent_id": "TI-17763315768888390766",
+            "decision_id": "TD-17763315768887361638",
             "execution_status": "executed",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-006",
-              "sig": "JnQYLoRnGXgp_F6q7_t2vI_v8CmbTBdAzE9RZZnhXuiulsEy5HDC3b7OwqafRPn2xf0FCg6Ss11SJ0wX-xy3Bw",
+              "sig": "ks1FBvFOb9fNyfCLXLp85WPy9b9bD51KOoEiYTa-g_-EC3LBYVAmD9OfFjT4H-jLcx_cwQu8DuGMkiiEndTqCw",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -450,10 +450,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "c40b19f536b9879836d0d18bdb13b4ddfc8986f293244b2009e7152417681001",
+            "event_snapshot_hash": "fa692b8b65d6b0056c3446528c23341c1d1a1cac2482cd037156a198c3816640",
             "correlation_id": "policy-eval-action-class-read:sess-6:0",
             "intent": {
-              "intent_id": "TI-17763290450824272217",
+              "intent_id": "TI-17763315768888390766",
               "actor_id": "audit-agent",
               "connector": "transient-atp",
               "action": "query_audit_log",
@@ -466,8 +466,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450827792281",
-              "intent_id": "TI-17763290450824272217",
+              "decision_id": "TD-17763315768887361638",
+              "intent_id": "TI-17763315768888390766",
               "outcome": "allow",
               "reason_code": "read_not_restricted",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -483,7 +483,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAmUmXn+vUKtaolq0yR9ldDFmP51D6XeUGExm0p5QV/d4=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAKNT23tDstX//J6hSCpZbn0F++56JS0nhOhtD/M2bEYk=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-007",
           "keyDistribution": {
             "published": true,
@@ -495,16 +495,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450827747490",
-            "intent_id": "TI-17763290450823654841",
-            "decision_id": "TD-17763290450823446207",
+            "receipt_id": "TR-17763315768886438207",
+            "intent_id": "TI-17763315768887376701",
+            "decision_id": "TD-17763315768885186666",
             "execution_status": "blocked",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-007",
-              "sig": "6qGCsB55ANvNz_EvrBYhmEpQpkYIL5p69yi5ITCecgVoZggLGXCw4ywfpr9Gus5jcORAXVBao7vwdmpA3J6KDQ",
+              "sig": "lup6mpDj3-AoNNZuWoWY22F8U-qjwsuNJdjGcfw3tMwW-uFJZt3PHmCnPCm4R1cXrDLEgYPS4sSy3DgBQ-2xDQ",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -522,10 +522,10 @@
                 }
               ]
             },
-            "event_snapshot_hash": "eda11f73efc3796256b17270fa21ac31f5a578a34de926a75523c7980ed03f63",
+            "event_snapshot_hash": "da84d895ccad09210c037d32c783dafe92b36fe1f35825d660656d5af7702680",
             "correlation_id": "policy-eval-action-class-delete:sess-7:0",
             "intent": {
-              "intent_id": "TI-17763290450823654841",
+              "intent_id": "TI-17763315768887376701",
               "actor_id": "cleanup-agent",
               "connector": "transient-atp",
               "action": "delete_user_data",
@@ -539,8 +539,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450823446207",
-              "intent_id": "TI-17763290450823654841",
+              "decision_id": "TD-17763315768885186666",
+              "intent_id": "TI-17763315768887376701",
               "outcome": "deny",
               "reason_code": "delete_requires_approval",
               "decided_at": "2026-03-31T00:00:02.000Z"
@@ -556,7 +556,7 @@
       "evidence": {
         "attestation": {
           "trustReceiptSigned": true,
-          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEALuY0wbXj2F9T43zeE9TFrdRMGotM30vMv84pIfQG7lc=\n-----END PUBLIC KEY-----\n",
+          "trustReceiptPublicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEArA/GDN+6IJ7vraGlq4+obGsMvholrM7TjqmUUc+P9so=\n-----END PUBLIC KEY-----\n",
           "trustReceiptKeyId": "external-runtime-key-008",
           "keyDistribution": {
             "published": true,
@@ -568,16 +568,16 @@
           },
           "trustReceipt": {
             "schemaVersion": "1.0.0",
-            "receipt_id": "TR-17763290450832054088",
-            "intent_id": "TI-17763290450839122944",
-            "decision_id": "TD-17763290450834014222",
+            "receipt_id": "TR-17763315768898915226",
+            "intent_id": "TI-17763315768898382973",
+            "decision_id": "TD-17763315768894349181",
             "execution_status": "executed",
             "captured_at": "2026-03-31T00:00:02.000Z",
             "signature": {
               "alg": "Ed25519",
               "version": "ATP-ED25519-1",
               "kid": "external-runtime-key-008",
-              "sig": "CKcxAksEb8y0PfYobPsNQq_zzm1zQ8mtnKRl09gMhys3fUXLtp1s8VCz4R5YVbTUsIPL7N3fU0c7nXt4FTYcDA",
+              "sig": "mf7xSJMEQQruYxQVyUUdp2oDlzTljsfgJMUzUzj1m-i0kwf6BSBVFwLK-oOmkZggw7GySyYPVD3bZr8QrSnCAQ",
               "canonicalization": "RFC8785-JCS"
             },
             "occurred_at": "2026-03-31T00:00:00.000Z",
@@ -592,7 +592,7 @@
             "event_snapshot_hash": "a0adc6f9a0ed351f4a225da282c24b42bddc10599d46b99f69da4ae64919c6f2",
             "correlation_id": "receipt-with-optional-fields:sess-8:0",
             "intent": {
-              "intent_id": "TI-17763290450839122944",
+              "intent_id": "TI-17763315768898382973",
               "actor_id": "api-agent",
               "connector": "transient-atp",
               "action": "process_payment",
@@ -608,8 +608,8 @@
               "requested_at": "2026-03-31T00:00:00.000Z"
             },
             "decision": {
-              "decision_id": "TD-17763290450834014222",
-              "intent_id": "TI-17763290450839122944",
+              "decision_id": "TD-17763315768894349181",
+              "intent_id": "TI-17763315768898382973",
               "outcome": "allow",
               "reason_code": "payment_within_limit",
               "decided_at": "2026-03-31T00:00:02.000Z"

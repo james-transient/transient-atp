@@ -17,6 +17,7 @@ import {
   generateSigningKeyPair,
   signReceipt,
   exportPublicKeyAsJwk,
+  canonicalBytes,
 } from "../../packages/spec/src/index.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -25,17 +26,16 @@ const FIXTURES_PATH = resolve(__dirname, "../fixtures/external/runtimes.v1.json"
 /**
  * Generate a test scenario with valid signature
  */
-function createScenario(runtimeId, intent, decision, executionStatus, eventSnapshot, keyIndex) {
+function createScenario(runtimeId, intent, decision, executionStatus, eventSnapshot, keyIndex, optionalFields = null) {
   const { publicKey, privateKey } = generateSigningKeyPair();
   const kid = `external-runtime-key-${String(keyIndex).padStart(3, "0")}`;
 
   const now = "2026-03-31T00:00:00.000Z";
   const sealed = "2026-03-31T00:00:02.000Z";
 
-  // Create event snapshot hash (SHA256 of canonical JSON)
-  const snapshotStr = JSON.stringify(eventSnapshot, Object.keys(eventSnapshot).sort());
+  // Create event snapshot hash (SHA256 of canonical JSON using RFC8785-JCS)
   const eventSnapshotHash = createHash("sha256")
-    .update(snapshotStr)
+    .update(canonicalBytes(eventSnapshot))
     .digest("hex");
 
   const unsignedReceipt = {
@@ -55,6 +55,11 @@ function createScenario(runtimeId, intent, decision, executionStatus, eventSnaps
     intent,
     decision,
   };
+
+  // Add optional fields if provided
+  if (optionalFields) {
+    Object.assign(unsignedReceipt, optionalFields);
+  }
 
   // Sign the receipt
   const signedReceipt = signReceipt(unsignedReceipt, privateKey, kid);
@@ -304,36 +309,38 @@ async function generateFixtures() {
     const s8Decision = makeDecision("allow", "payment_within_limit");
     s8Decision.intent_id = s8Intent.intent_id;
 
-    const s8Scenario = createScenario(
-      "receipt-with-optional-fields",
-      s8Intent,
-      s8Decision,
-      "executed",
-      {
-        runId: "receipt-with-optional-fields",
-        sessionId: "sess-optional",
-        input_size: 1024,
-        output_size: 2048,
+    const s8OptionalFields = {
+      input_hash: "d".repeat(64),
+      output_hash: "e".repeat(64),
+      cost: {
+        amount: "0.50",
+        currency: "USD",
+        unit: "request",
+        payer: "user-123",
       },
-      keyIndex++
+      metadata: {
+        client_id: "web-app-v2",
+        deployment: "us-west-2",
+        trace_id: "xyz-789-abc",
+      },
+    };
+
+    scenarios.push(
+      createScenario(
+        "receipt-with-optional-fields",
+        s8Intent,
+        s8Decision,
+        "executed",
+        {
+          runId: "receipt-with-optional-fields",
+          sessionId: "sess-optional",
+          input_size: 1024,
+          output_size: 2048,
+        },
+        keyIndex++,
+        s8OptionalFields
+      )
     );
-
-    // Add optional fields to the receipt
-    s8Scenario.evidence.attestation.trustReceipt.input_hash = "d".repeat(64);
-    s8Scenario.evidence.attestation.trustReceipt.output_hash = "e".repeat(64);
-    s8Scenario.evidence.attestation.trustReceipt.cost = {
-      amount: "0.50",
-      currency: "USD",
-      unit: "request",
-      payer: "user-123",
-    };
-    s8Scenario.evidence.attestation.trustReceipt.metadata = {
-      client_id: "web-app-v2",
-      deployment: "us-west-2",
-      trace_id: "xyz-789-abc",
-    };
-
-    scenarios.push(s8Scenario);
 
     // Write to file
     const output = { runtimes: scenarios };

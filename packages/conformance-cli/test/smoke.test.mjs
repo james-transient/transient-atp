@@ -279,7 +279,7 @@ test("proof harness supports external runtimes fixture mode", async () => {
   });
   assert.equal(report.protocol, "ATP");
   assert.equal(Array.isArray(report.results), true);
-  assert.equal(report.results.length, 5);
+  assert.equal(report.results.length, 8);
   assert.equal(report.results[0].runtimeId, "financial-flowers-allow-under-budget");
   assert.equal(report.results[0].atpL1.signatureVerified, true);
 });
