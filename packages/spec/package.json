@@ -1,5 +1,5 @@
 {
-  "name": "@atp/spec",
+  "name": "@atp-protocol/spec",
   "version": "1.0.0",
   "description": "ATP protocol constants and JSON schemas.",
   "license": "Apache-2.0",

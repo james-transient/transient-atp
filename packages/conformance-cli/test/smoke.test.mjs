@@ -12,7 +12,7 @@ import {
   evaluateReleaseGovernanceEvidence,
   validateReleaseGovernanceReport
 } from "../src/lib/release-governance.mjs";
-import { generateSigningKeyPair, signReceipt, verifyReceiptSignature } from "@atp/spec";
+import { generateSigningKeyPair, signReceipt, verifyReceiptSignature } from "@atp-protocol/spec";
 
 test("Ed25519 sign and verify round-trip on a valid receipt", () => {
   const { privateKey, publicKey } = generateSigningKeyPair();

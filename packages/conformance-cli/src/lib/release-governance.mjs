@@ -8,7 +8,7 @@ import {
   exportPublicKeyAsJwk,
   buildJwks,
   verifyReceiptSignature
-} from "@atp/spec";
+} from "@atp-protocol/spec";
 
 const REQUIRED_LIFECYCLE_STAGES = Object.freeze([
   "preflight_declaration",

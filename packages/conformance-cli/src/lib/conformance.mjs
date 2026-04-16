@@ -4,7 +4,7 @@ import {
   ATP_PROTOCOL,
   ATP_VERSION,
   verifyReceiptSignature
-} from "@atp/spec";
+} from "@atp-protocol/spec";
 import { validateReceiptATP } from "./receipt.mjs";
 
 export function evaluateRuntimeConformance(runtime) {

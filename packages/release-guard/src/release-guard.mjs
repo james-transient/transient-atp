@@ -3,7 +3,7 @@ import { createHash, randomInt } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { generateSigningKeyPair, signReceipt } from "@atp/spec";
+import { generateSigningKeyPair, signReceipt } from "@atp-protocol/spec";
 
 function stableStringify(value) {
   if (Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
 import { createSampleReceipt } from "./receipt.mjs";
 import { runConformanceProofHarness } from "./conformance.mjs";
-import { generateSigningKeyPair, signReceipt } from "@atp/spec";
+import { generateSigningKeyPair, signReceipt } from "@atp-protocol/spec";
 
 function sampleRuntimes(frames) {
   const baseEvents = frames

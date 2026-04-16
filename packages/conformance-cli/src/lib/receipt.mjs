@@ -5,7 +5,7 @@ import {
   ATP_RECEIPT_VALIDATION_CODES,
   ATP_DEPRECATED,
   canonicalBytes
-} from "@atp/spec";
+} from "@atp-protocol/spec";
 
 export function hashEventSnapshot(snapshot) {
   return createHash("sha256").update(canonicalBytes(snapshot)).digest("hex");
