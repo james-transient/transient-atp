@@ -72,6 +72,22 @@ External signed fixture corpus for interoperability checks:
 
 - `conformance-kit/fixtures/external/runtimes.v1.json`
 
+## Fixture Generation
+
+To regenerate test fixtures with fresh Ed25519 signatures, run:
+
+```bash
+node conformance-kit/scripts/generate-fixtures.mjs
+```
+
+This generates 8 comprehensive test scenarios covering:
+- Decision outcomes: allow, approve, deny
+- Execution statuses: executed, blocked, expired, error
+- Policy evaluation: different action classes (read, delete)
+- Optional fields: input_hash, output_hash, cost, metadata
+
+All signatures are valid Ed25519 with RFC8785-JCS canonicalization.
+
 Validate an existing report against the contract:
 
 ```bash
