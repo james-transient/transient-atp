@@ -106,6 +106,10 @@ async function main() {
       executionStatuses: { covered: ["executed", "blocked", "expired", "error"] },
       complete: true
     },
+    controlChecks: {
+      keyDistribution: true,
+      replayProtection: true
+    },
     results: [
       {
         runtimeId: "r1",
@@ -122,6 +126,10 @@ async function main() {
       decisionOutcomes: ["allow"],
       executionStatuses: ["executed"],
       complete: true
+    },
+    requiredControlChecks: {
+      keyDistribution: true,
+      replayProtection: true
     },
     requiredRuntimes: [
       {

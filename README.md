@@ -81,9 +81,23 @@ npm install @atp-protocol/spec
 **Sign and verify a receipt:**
 
 ```js
-import { generateSigningKeyPair, signReceipt, verifyReceiptSignature, exportPublicKeyAsJwk, buildJwks } from '@atp-protocol/spec';
+import { createHash } from 'node:crypto';
+import { generateSigningKeyPair, signReceipt, verifyReceiptSignature, canonicalBytes, exportPublicKeyAsJwk, buildJwks } from '@atp-protocol/spec';
 
 const { privateKey, publicKey } = generateSigningKeyPair();
+
+const eventSnapshot = { action: 'purchase', item: 'flowers' };
+const now = new Date().toISOString();
+
+const receipt = {
+  receipt_id: 'TR-1', intent_id: 'TI-1', decision_id: 'TD-1',
+  execution_status: 'executed', schemaVersion: '1.0.0',
+  occurred_at: now, received_at: now, sealed_at: now, captured_at: now,
+  event_snapshot: eventSnapshot,
+  event_snapshot_hash: createHash('sha256').update(canonicalBytes(eventSnapshot)).digest('hex'),
+  correlation_id: 'sess-1'
+};
+
 const signed = signReceipt(receipt, privateKey, 'key-2026-01');
 
 // Serve at /.well-known/atp-keys

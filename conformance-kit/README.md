@@ -29,7 +29,10 @@ For the stricter industry-grade gate:
 
 ```bash
 npm run conformance:industry
+npm run conformance:industry:strict   # higher-assurance profile — see note below
 ```
+
+> **Note on `conformance:industry:strict`:** This profile requires external setup before it will pass — specifically, at least two implemented interop targets in `conformance-kit/expected/interop-matrix.json` and an independent verifier command configured via the `ATP_INDEPENDENT_VERIFIER_CMD` environment variable. It is intended for release hardening and external trust posture, not local development. Running it without that setup will fail on `INTEROP-MATRIX` and `INDEPENDENT-VERIFIER-HOOK` by design.
 
 Run through the CLI package:
 

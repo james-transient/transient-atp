@@ -107,9 +107,9 @@ const receiptSchema = getSchemaPath('receipt');
 Or import the JSON directly:
 
 ```js
-import intentSchema from '@atp-protocol/spec/schemas/intent' assert { type: 'json' };
-import decisionSchema from '@atp-protocol/spec/schemas/decision' assert { type: 'json' };
-import receiptSchema from '@atp-protocol/spec/schemas/receipt' assert { type: 'json' };
+import intentSchema from '@atp-protocol/spec/schemas/intent' with { type: 'json' };
+import decisionSchema from '@atp-protocol/spec/schemas/decision' with { type: 'json' };
+import receiptSchema from '@atp-protocol/spec/schemas/receipt' with { type: 'json' };
 ```
 
 ## Exports
