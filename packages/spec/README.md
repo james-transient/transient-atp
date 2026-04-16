@@ -68,17 +68,17 @@ const result = guard.check(signedReceipt);
 ```js
 import { getSchemaPath } from '@atp-protocol/spec';
 
-const intentSchema = getSchemaPath('intent');   // absolute path to intent.schema.json
+const intentSchema = getSchemaPath('intent');    // absolute path to intent.schema.json
 const decisionSchema = getSchemaPath('decision');
 const receiptSchema = getSchemaPath('receipt');
 ```
 
-Or import directly:
+Or import the JSON directly:
 
 ```js
-import intentSchema from '@atp-protocol/spec/schemas/intent';
-import decisionSchema from '@atp-protocol/spec/schemas/decision';
-import receiptSchema from '@atp-protocol/spec/schemas/receipt';
+import intentSchema from '@atp-protocol/spec/schemas/intent' assert { type: 'json' };
+import decisionSchema from '@atp-protocol/spec/schemas/decision' assert { type: 'json' };
+import receiptSchema from '@atp-protocol/spec/schemas/receipt' assert { type: 'json' };
 ```
 
 ## Exports

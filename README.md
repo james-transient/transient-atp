@@ -101,15 +101,6 @@ const guard = new ReplayGuard(); // 5 minute window, 30 second clock skew tolera
 const { ok, reason } = guard.check(receipt);
 ```
 
-**Run the conformance CLI:**
-
-```bash
-npm exec -- atp-conformance kit
-npm exec -- atp-conformance industry
-npm exec -- atp-conformance run --openclaw-frames conformance-kit/fixtures/openclaw/gateway-frames-live.json
-npm exec -- atp-conformance run --runtimes-fixture conformance-kit/fixtures/external/runtimes.v1.json
-```
-
 ## Intended use
 
 ATP is designed for teams that need to govern and audit autonomous agent behaviour across systems:
