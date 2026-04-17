@@ -14,9 +14,7 @@
 
 *Created and maintained by [Transient Intelligence Ltd](https://transientintelligence.com)*
 
-## The problem
-
-Autonomous agents can now act without a human in the loop: browse, purchase, execute code, call APIs, move money. The missing piece is not capability. It is governance: a standardised way to record what an agent was authorised to do, what decision was made, and what happened — in a form that is tamper-evident and independently verifiable.
+Autonomous agents can now act without a human in the loop: browse, purchase, execute code, call APIs, move money. The missing piece is not capability. It is governance: a standardised way to record what an agent was authorised to do, what decision was made, and what happened, in a form that is tamper-evident and independently verifiable.
 
 Without that, you cannot audit an agent, hold a system accountable, or safely delegate anything that matters to an autonomous process.
 
@@ -69,7 +67,7 @@ To run the full industry-grade gate:
 
 ```bash
 npm run conformance:industry
-npm run conformance:industry:strict   # higher-assurance profile
+npm run conformance:industry:strict
 ```
 
 ## Using the packages
@@ -111,13 +109,13 @@ const { ok } = verifyReceiptSignature(signed, publicKey);
 ```js
 import { ReplayGuard } from '@atp-protocol/spec';
 
-const guard = new ReplayGuard(); // 5 minute window, 30 second clock skew tolerance
+const guard = new ReplayGuard();
 const { ok, reason } = guard.check(receipt);
 ```
 
 ## Intended use
 
-ATP is designed for teams that need to govern and audit autonomous agent behaviour across systems:
+ATP is for teams that need to govern and audit autonomous agent behaviour across systems:
 
 - Implement ATP in an agent runtime and produce machine-verifiable conformance evidence
 - Require ATP conformance evidence in vendor or platform selection
