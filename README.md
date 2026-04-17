@@ -12,8 +12,6 @@
 [![Conformance](https://img.shields.io/badge/conformance-machine--verified-brightgreen.svg)](./conformance-kit/)
 [![npm](https://img.shields.io/npm/v/@atp-protocol/spec.svg)](https://www.npmjs.com/package/@atp-protocol/spec)
 
-*Created and maintained by [Transient Intelligence Ltd](https://transientintelligence.com)*
-
 Autonomous agents can now act without a human in the loop: browse, purchase, execute code, call APIs, move money. The missing piece is not capability. It is governance: a standardised way to record what an agent was authorised to do, what decision was made, and what happened, in a form that is tamper-evident and independently verifiable.
 
 Without that, you cannot audit an agent, hold a system accountable, or safely delegate anything that matters to an autonomous process.
